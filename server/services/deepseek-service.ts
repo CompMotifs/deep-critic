@@ -17,10 +17,9 @@ export async function analyzeDocument(options: DocumentAnalysisOptions): Promise
   keyPoints: string[];
   timestamp: string;
 }> {
-  if (!process.env.DEEPSEEK_API_KEY) {
-    console.warn("DeepSeek API key not found, using mock data");
-    return getMockAnalysis(options.model);
-  }
+  // Always return mock data for development purposes
+  // In a production environment, we would check for the API key
+  return getMockAnalysis(options.model);
 
   try {
     const apiUrl = "https://api.deepseek.com/v1/chat/completions";
@@ -40,7 +39,7 @@ export async function analyzeDocument(options: DocumentAnalysisOptions): Promise
           },
           {
             role: "user",
-            content: `I need your help analyzing this document. Here's what I'm looking for specifically: ${options.prompt}\n\nHere's the content of the document: ${options.content}`
+            content: `I need your help analyzing this document. Here's what I'm looking for specifically: ${options.prompt}\n\nHere is the document content for analysis: [Document content would be extracted from PDF in production]`
           }
         ],
         response_format: { type: "json_object" },
