@@ -29,6 +29,20 @@ const agents: Agent[] = [
     description: "Quick high-level overview with good efficiency",
     color: "bg-[#10B981]",
     letter: "M"
+  },
+  {
+    id: "deepseek-lite",
+    name: "DeepSeek Lite",
+    description: "Comprehensive document analysis with DeepSeek AI",
+    color: "bg-[#3B82F6]",
+    letter: "D"
+  },
+  {
+    id: "deepseek-coder",
+    name: "DeepSeek Coder",
+    description: "Specialized for technical document and code review",
+    color: "bg-[#6366F1]",
+    letter: "DC"
   }
 ];
 

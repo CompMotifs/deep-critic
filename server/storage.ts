@@ -47,10 +47,28 @@ export class DatabaseStorage implements IStorage {
   
   // ReviewJob methods
   async createReviewJob(job: InsertReviewJob): Promise<ReviewJob> {
+    // Create a cloned object to avoid modifying the original
+    const { selectedAgents, ...rest } = job;
+    
+    // Make sure selectedAgents is a valid string array for PostgreSQL JSONB
+    let agentsArray: string[] = [];
+    
+    if (Array.isArray(selectedAgents)) {
+      agentsArray = selectedAgents.map(agent => String(agent));
+    } else if (selectedAgents) {
+      // Handle any other case by converting to string array
+      agentsArray = [String(selectedAgents)];
+    }
+    
+    // Insert the review job with properly formatted data
     const [reviewJob] = await db
       .insert(reviewJobs)
-      .values(job)
+      .values({
+        ...rest,
+        selectedAgents: agentsArray
+      })
       .returning();
+      
     return reviewJob;
   }
   
@@ -83,9 +101,15 @@ export class DatabaseStorage implements IStorage {
   
   // Document methods
   async saveDocument(document: InsertDocument): Promise<Document> {
+    // Extract and sanitize values to ensure correct types
+    const { jobId, content } = document;
+    
     const [newDocument] = await db
       .insert(documents)
-      .values(document)
+      .values({
+        jobId: Number(jobId),
+        content: String(content)
+      })
       .returning();
     return newDocument;
   }
