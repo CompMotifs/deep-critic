@@ -1,3 +1,5 @@
+@import url('https://fonts.cdnfonts.com/css/optima');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,6 +10,7 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Optima', sans-serif;
+    @apply antialiased bg-background text-foreground;
   }
 }

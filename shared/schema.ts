@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, jsonb, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, jsonb, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -21,14 +21,14 @@ export const reviewJobs = pgTable("review_jobs", {
   documentTitle: varchar("document_title", { length: 255 }).notNull(),
   documentHash: varchar("document_hash", { length: 64 }).notNull(),
   prompt: text("prompt").notNull(),
-  selectedAgents: jsonb("selected_agents").notNull().$type<string[]>(),
+  selectedAgents: jsonb("selected_agents").$type<string[]>().notNull(),
   status: varchar("status", { length: 50 }).notNull().default("pending"),
   progress: integer("progress").notNull().default(0),
   summary: text("summary"),
-  keyFindings: jsonb("key_findings").$type<Array<{type: string, text: string}>>,
+  keyFindings: jsonb("key_findings").$type<Array<{type: string, text: string}>>(),
   strengths: jsonb("strengths").$type<string[]>(),
   weaknesses: jsonb("weaknesses").$type<string[]>(),
-  comparisonAspects: jsonb("comparison_aspects").$type<Array<{name: string, values: Record<string, string>}>>,
+  comparisonAspects: jsonb("comparison_aspects").$type<Array<{name: string, values: Record<string, string>}>>(),
   agentResults: jsonb("agent_results").$type<Array<{
     agentName: string,
     feedback: string,

@@ -106,7 +106,6 @@ const Home = () => {
 
         {step === "config" && (
           <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Review Configuration</h2>
             
             <FileUpload
               file={file}
@@ -130,7 +129,7 @@ const Home = () => {
                 disabled={!isFormValid || reviewMutation.isPending}
                 className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                DeepCritic Search
+                Start DeepCritic
               </Button>
             </div>
           </form>

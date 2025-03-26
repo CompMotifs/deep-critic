@@ -40,7 +40,7 @@ interface AgentSelectionProps {
 const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) => {
   return (
     <div className="mb-8">
-      <h3 className="text-md font-medium text-gray-700 mb-2">3. Select AI Agents</h3>
+      <h3 className="text-md font-medium text-gray-700 mb-2">Step 3: Select AI Agents</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
         {agents.map(agent => (
