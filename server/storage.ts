@@ -49,11 +49,7 @@ export class DatabaseStorage implements IStorage {
   async createReviewJob(job: InsertReviewJob): Promise<ReviewJob> {
     const [reviewJob] = await db
       .insert(reviewJobs)
-      .values({
-        ...job,
-        status: "pending",
-        progress: 0
-      })
+      .values(job)
       .returning();
     return reviewJob;
   }

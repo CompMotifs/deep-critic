@@ -123,11 +123,12 @@ const Home = () => {
               onToggleAgent={toggleAgent}
             />
             
-            <div className="flex justify-end">
+            <div className="flex justify-end mt-6">
               <Button
                 type="submit"
+                size="lg"
                 disabled={!isFormValid || reviewMutation.isPending}
-                className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-primary text-white font-medium"
               >
                 Start DeepCritic
               </Button>
