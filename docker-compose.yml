@@ -1,49 +1,21 @@
-version: '3.8'
-
+# Simple Docker Compose for DeepCritic
 services:
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
     ports:
-      - "8000:8000"
-    volumes:
-      - ./backend:/app  # For development - auto-reload with code changes
-    env_file:
-      - .env
+      - "8000:5000"
     environment:
-      - DEBUG=true
-      # Add other environment variables as needed
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-dummy-key-for-development}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-dummy-key-for-development}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-dummy-key-for-development}
+    restart: unless-stopped
 
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
+      context: ./frontend
     ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app  # For development - auto-reload with code changes
+      - "8080:80"
     depends_on:
       - backend
-
-networks:
-  default:
-    name: deep_critic_network# Docker Compose configuration for DeepCritic
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:5000"
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/deepcritic
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-dummy-key-for-development}
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-dummy-key-for-development}
-      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-dummy-key-for-development}
     restart: unless-stopped
-    # Simple command that uses a sleep instead of netcat
-    command: >
-      bash -c "
-        npm run dev
-      "
