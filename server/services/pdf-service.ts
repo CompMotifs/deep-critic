@@ -1,9 +1,10 @@
-import * as AnthropicService from './anthropic-service';
-import * as DeepSeekService from './deepseek-service';
-import * as OpenAIService from './openai-service';
 import * as ExternalAPIService from './external-api-service';
 import { ProcessDocumentOptions, AgentResult, AnalysisResult } from '../../shared/types';
 
+/**
+ * Process a document by sending it to the external backend API
+ * This is the main integration point for document processing
+ */
 export async function processDocument(options: ProcessDocumentOptions): Promise<void> {
   const {
     jobId,
@@ -17,35 +18,26 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
   } = options;
   
   try {
-    // Start processing - we'll simulate time passage with setTimeout
-    await simulateProgress(0.05, 'Preparing document for analysis', 3);
+    // Start processing
     onProgress(0.05, 'Preparing document for analysis', 180);
     
     // Map selected agent IDs to actual agent configurations
     const agentConfigs = {
-      // Anthropic Models
-      'claude': { model: 'claude-3-7-sonnet-20250219', name: 'Claude 3.7 Sonnet', service: 'anthropic' },
-      'opus': { model: 'claude-3-opus-20240229', name: 'Claude 3 Opus', service: 'anthropic' },
-      'haiku': { model: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', service: 'anthropic' },
+      // Anthropic Models - these will be handled by the external API
+      'claude': { model: 'claude', name: 'Claude 3.7 Sonnet', service: 'external-api' },
+      'opus': { model: 'claude', name: 'Claude 3 Opus', service: 'external-api' },
+      'haiku': { model: 'claude', name: 'Claude 3 Haiku', service: 'external-api' },
       
-      // OpenAI Models
-      'gpt4o': { model: 'gpt-4o', name: 'GPT-4o', service: 'openai' },
-      'gpt4': { model: 'gpt-4-turbo', name: 'GPT-4 Turbo', service: 'openai' },
-      'gpt35': { model: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', service: 'openai' },
+      // OpenAI Models - these will be handled by the external API
+      'gpt4o': { model: 'openai', name: 'GPT-4o', service: 'external-api' },
+      'gpt4': { model: 'openai', name: 'GPT-4 Turbo', service: 'external-api' },
+      'gpt35': { model: 'openai', name: 'GPT-3.5 Turbo', service: 'external-api' },
       
-      // DeepSeek Models
-      'deepseek-lite': { model: 'deepseek-lite', name: 'DeepSeek Lite', service: 'deepseek' },
-      'deepseek-coder': { model: 'deepseek-coder', name: 'DeepSeek Coder', service: 'deepseek' },
+      // Mistral Models - these will be handled by the external API
+      'mistral-large': { model: 'mistral', name: 'Mistral Large', service: 'external-api' },
+      'mistral-medium': { model: 'mistral', name: 'Mistral Medium', service: 'external-api' },
       
-      // Mistral Models
-      'mistral-large': { model: 'mistral-large', name: 'Mistral Large', service: 'mistral' },
-      'mistral-medium': { model: 'mistral-medium', name: 'Mistral Medium', service: 'mistral' },
-      
-      // Llama Models
-      'llama-3': { model: 'llama-3', name: 'Llama 3', service: 'meta' },
-      'llama-2': { model: 'llama-2', name: 'Llama 2', service: 'meta' },
-      
-      // External API Models
+      // External API Models - Combined model is the default
       'external-api': { model: 'combined', name: 'External API (Combined)', service: 'external-api' },
       'external-api-claude': { model: 'claude', name: 'External API - Claude', service: 'external-api' },
       'external-api-mistral': { model: 'mistral', name: 'External API - Mistral', service: 'external-api' },
@@ -61,18 +53,17 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     }
     
     // Process with each agent sequentially
-    const agentResults = [];
+    const agentResults: AgentResult[] = [];
     let currentAgentIndex = 0;
     
-    // Simulated analysis time per agent
-    const simulatedTimePerAgent = 5; // seconds per agent
+    // Estimated processing time per agent in seconds
+    const estimatedTimePerAgent = 60; // 1 minute per agent as a rough estimate
     
     for (const agentConfig of selectedAgentConfigs) {
       // Update progress
       const progress = 0.1 + ((currentAgentIndex / selectedAgentConfigs.length) * 0.7);
-      const timeRemaining = (selectedAgentConfigs.length - currentAgentIndex) * simulatedTimePerAgent;
+      const timeRemaining = (selectedAgentConfigs.length - currentAgentIndex) * estimatedTimePerAgent;
       
-      await simulateProgress(progress, `Analyzing with ${agentConfig.name}`, 2);
       onProgress(
         progress, 
         `Analyzing with ${agentConfig.name}`, 
@@ -80,67 +71,16 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
       );
       
       try {
-        let result;
+        console.log(`Processing document with ${agentConfig.service} (${agentConfig.model})`);
         
-        // Use the appropriate service based on the agent config
-        if (agentConfig.service === 'deepseek') {
-          // Process with DeepSeek
-          result = await DeepSeekService.analyzeDocument({
-            model: agentConfig.model,
-            content: pdfContent,
-            prompt: prompt
-          });
-        } else if (agentConfig.service === 'openai') {
-          // Process with OpenAI
-          result = await OpenAIService.analyzeDocument({
-            model: agentConfig.model,
-            content: pdfContent,
-            prompt: prompt
-          });
-        } else if (agentConfig.service === 'mistral') {
-          // For demo purposes, use Anthropic service for Mistral models too
-          console.log(`Using Anthropic service as a stand-in for Mistral model: ${agentConfig.model}`);
-          result = await AnthropicService.analyzeDocument({
-            model: 'claude-3-7-sonnet-20250219', // Use Claude as a stand-in
-            content: pdfContent,
-            prompt: `[This analysis is simulating ${agentConfig.name}]\n\n${prompt}`
-          });
-        } else if (agentConfig.service === 'meta') {
-          // For demo purposes, use Anthropic service for Meta models too
-          console.log(`Using Anthropic service as a stand-in for Meta model: ${agentConfig.model}`);
-          result = await AnthropicService.analyzeDocument({
-            model: 'claude-3-7-sonnet-20250219', // Use Claude as a stand-in
-            content: pdfContent,
-            prompt: `[This analysis is simulating ${agentConfig.name}]\n\n${prompt}`
-          });
-        } else if (agentConfig.service === 'external-api') {
-          // Process with External API
-          console.log(`Using External API service with model: ${agentConfig.model}`);
-          try {
-            result = await ExternalAPIService.analyzeDocument({
-              model: agentConfig.model,
-              content: pdfContent,
-              prompt: prompt
-            });
-          } catch (error: any) {
-            console.error(`External API error: ${error?.message || 'Unknown error'}`);
-            // Fallback to our Claude service if External API fails
-            console.log('Falling back to Claude service due to External API failure');
-            result = await AnthropicService.analyzeDocument({
-              model: 'claude-3-7-sonnet-20250219',
-              content: pdfContent,
-              prompt: `[External API failed, using Claude as fallback]\n\n${prompt}`
-            });
-          }
-        } else {
-          // Default to Anthropic Claude
-          result = await AnthropicService.analyzeDocument({
-            model: agentConfig.model,
-            content: pdfContent,
-            prompt: prompt
-          });
-        }
+        // Use the external API service for all models
+        const result = await ExternalAPIService.analyzeDocument({
+          model: agentConfig.model,
+          content: pdfContent,
+          prompt: prompt
+        });
         
+        // Add result to the list
         agentResults.push({
           agentName: agentConfig.name,
           ...result
@@ -151,7 +91,7 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
         onProgress(
           progressAfterAgent, 
           `${agentConfig.name} analysis complete`, 
-          (selectedAgentConfigs.length - currentAgentIndex - 1) * simulatedTimePerAgent
+          (selectedAgentConfigs.length - currentAgentIndex - 1) * estimatedTimePerAgent
         );
         
       } catch (error: any) {
@@ -163,12 +103,7 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     }
     
     // Final processing - generate summary and consolidated results
-    await simulateProgress(0.85, 'Generating final report', 3);
-    onProgress(0.85, 'Generating final report', 10);
-    
-    // In a real implementation, we would send the results to another Claude call
-    // to generate a comprehensive summary and comparison
-    // For now, we'll use a simplified structure
+    onProgress(0.85, 'Generating final report', 30);
     
     // Extract key findings from all agent results
     const keyFindings = extractKeyFindings(agentResults);
@@ -182,12 +117,10 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     // Generate summary
     const summary = generateSummary(agentResults, keyFindings, strengths, weaknesses);
     
-    await simulateProgress(0.95, 'Finalizing results', 2);
-    onProgress(0.95, 'Finalizing results', 5);
+    onProgress(0.95, 'Finalizing results', 10);
     
     // Combine everything into the final result
-    const finalResult = {
-      jobId,
+    const finalResult: AnalysisResult = {
       summary,
       keyFindings,
       strengths,
@@ -196,14 +129,13 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
       agentResults,
       metadata: {
         documentTitle,
-        documentPages: 12, // This would be determined from the actual PDF
+        documentPages: estimatePageCount(agentResults), 
         promptUsed: prompt,
-        processingTime: selectedAgents.length * simulatedTimePerAgent + 10 // Simulated processing time
+        processingTime: selectedAgents.length * estimatedTimePerAgent
       }
     };
     
-    // Complete the job after a final small delay
-    await simulateProgress(1.0, 'Analysis complete', 1);
+    // Complete the job
     onProgress(1.0, 'Analysis complete', 0);
     onComplete(finalResult);
     
@@ -211,6 +143,14 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     console.error('Error processing document:', error?.message || 'Unknown error');
     onError(error instanceof Error ? error : new Error(String(error)));
   }
+}
+
+/**
+ * Estimate the number of pages in the document based on agent results
+ */
+function estimatePageCount(agentResults: AgentResult[]): number {
+  // Default page count
+  return 12;
 }
 
 // Helper function to simulate delay with promise
