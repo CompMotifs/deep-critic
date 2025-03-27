@@ -4,7 +4,7 @@ export function useReviewForm(maxChars = 500) {
   const [file, setFile] = useState<File | null>(null);
   const [prompt, setPrompt] = useState<string>("");
   const [charCount, setCharCount] = useState<number>(0);
-  const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
+  const [selectedAgents, setSelectedAgents] = useState<string[]>(["claude", "opus"]);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   
   // Update character count when prompt changes
@@ -33,7 +33,7 @@ export function useReviewForm(maxChars = 500) {
   const resetForm = () => {
     setFile(null);
     setPrompt("");
-    setSelectedAgents([]);
+    setSelectedAgents(["claude", "opus"]);
   };
   
   return {

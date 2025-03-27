@@ -156,13 +156,22 @@ const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) 
   };
 
   return (
-    <div className="h-full">
+    <div className="mb-8">
       <div className="flex justify-between items-center mb-2">
         <div>
           <h3 className="text-md font-medium text-gray-700">Step 3: Select AI Agents</h3>
           <p className="text-xs text-gray-500 mt-1">Select up to {MAX_AGENTS} agents for document analysis</p>
         </div>
         <div className="flex space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            type="button"
+            onClick={handleSelectAll}
+            disabled={selectedAgents.length >= MAX_AGENTS}
+          >
+            Select All
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
@@ -175,7 +184,7 @@ const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) 
         </div>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
         {agents.map(agent => {
           const isSelected = selectedAgents.includes(agent.id);
           const isDisabled = !isSelected && selectedAgents.length >= MAX_AGENTS;
@@ -183,7 +192,7 @@ const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) 
           return (
             <div 
               key={agent.id} 
-              className={`relative border rounded-lg p-2 transition ${
+              className={`relative border rounded-lg p-4 transition ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-sm cursor-pointer'
               }`}
             >
@@ -192,7 +201,7 @@ const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) 
                 checked={isSelected}
                 onCheckedChange={() => handleToggleAgent(agent.id)}
                 disabled={isDisabled}
-                className="absolute top-2 right-2 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                className="absolute top-3 right-3 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
               <TooltipProvider>
                 <Tooltip>
@@ -202,7 +211,7 @@ const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) 
                       className={`flex items-start ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                     >
                       <span className="flex h-6 items-center">
-                        <span className={`text-sm w-6 h-6 rounded-full flex items-center justify-center ${agent.color} text-white mr-2`}>
+                        <span className={`text-lg w-8 h-8 rounded-full flex items-center justify-center ${agent.color} text-white mr-3`}>
                           {agent.letter}
                         </span>
                       </span>
