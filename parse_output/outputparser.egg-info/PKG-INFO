@@ -1,0 +1,42 @@
+Metadata-Version: 2.4
+Name: outputparser
+Version: 0.1.0
+Summary: LLM feedback parser and converter for generating OpenReview-style reviews from multiple LLM agents.
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Requires-Dist: openai>=0.27.0
+Requires-Dist: numpy
+Requires-Dist: regex
+
+# Output Parser
+Implements the LLM feedback parser and converter for generating OpenReview-style reviews from multiple LLM agents. The tool parses raw feedback (with sections such as Summary, Soundness, Presentation, Contribution, Strengths, Weaknesses, Questions, Limitations, Rating), aggregates scores from 10 LLMs, computes a consensus-based Confidence score, and then uses another LLM (via an API call) to generate the final review.
+
+## Structure
+
+- **src/parser.py**: Contains functions to parse individual LLM outputs.
+- **src/converter.py**: Implements the conversion step using an LLM API (or simulated function).
+- **src/review_processor.py**: Orchestrates parsing, aggregation, and conversion.
+- **tests/**: Unit tests for each module.
+
+## Requirements
+
+See [requirements.txt](requirements.txt).
+
+## Setup
+
+Install dependencies with:
+```bash
+pip install -r requirements.txt
+```
+
+Install the package:
+```bash
+pip install -e .
+```
+
+## Run tests
+```bash
+python -m unittest discover tests
+```
