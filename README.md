@@ -40,6 +40,15 @@ A successful response returns structured JSON data containing reviews from the i
 }
 ```
 
+## Test pdf convert and LLM review
+Replace the file path with a path to a small pdf locally. 
+
+```bash
+curl -X POST \
+-F "pdf_file=@/Users/jgerold/coding/compute-for-science/short_paper.pdf" \
+http://localhost:8000/api/upload-and-review
+```
+
 ### Troubleshooting
 
 If the response contains errors, ensure that:
