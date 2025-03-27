@@ -25,8 +25,9 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
   } = options;
   
   try {
-    // Start processing
-    onProgress(0.1, 'Preparing document for analysis', 120);
+    // Start processing - we'll simulate time passage with setTimeout
+    await simulateProgress(0.05, 'Preparing document for analysis', 3);
+    onProgress(0.05, 'Preparing document for analysis', 180);
     
     // Map selected agent IDs to actual agent configurations
     const agentConfigs = {
@@ -49,10 +50,15 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     const agentResults = [];
     let currentAgentIndex = 0;
     
+    // Simulated analysis time per agent
+    const simulatedTimePerAgent = 5; // seconds per agent
+    
     for (const agentConfig of selectedAgentConfigs) {
       // Update progress
-      const progress = 0.1 + ((currentAgentIndex / selectedAgentConfigs.length) * 0.8);
-      const timeRemaining = (selectedAgentConfigs.length - currentAgentIndex) * 60;
+      const progress = 0.1 + ((currentAgentIndex / selectedAgentConfigs.length) * 0.7);
+      const timeRemaining = (selectedAgentConfigs.length - currentAgentIndex) * simulatedTimePerAgent;
+      
+      await simulateProgress(progress, `Analyzing with ${agentConfig.name}`, 2);
       onProgress(
         progress, 
         `Analyzing with ${agentConfig.name}`, 
@@ -83,6 +89,15 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
           agentName: agentConfig.name,
           ...result
         });
+        
+        // Update progress after agent completes
+        const progressAfterAgent = 0.1 + (((currentAgentIndex + 1) / selectedAgentConfigs.length) * 0.7);
+        onProgress(
+          progressAfterAgent, 
+          `${agentConfig.name} analysis complete`, 
+          (selectedAgentConfigs.length - currentAgentIndex - 1) * simulatedTimePerAgent
+        );
+        
       } catch (error) {
         console.error(`Error analyzing with ${agentConfig.name}:`, error);
         // We continue with other agents even if one fails
@@ -92,7 +107,8 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     }
     
     // Final processing - generate summary and consolidated results
-    onProgress(0.9, 'Generating final report', 30);
+    await simulateProgress(0.85, 'Generating final report', 3);
+    onProgress(0.85, 'Generating final report', 10);
     
     // In a real implementation, we would send the results to another Claude call
     // to generate a comprehensive summary and comparison
@@ -110,6 +126,9 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     // Generate summary
     const summary = generateSummary(agentResults, keyFindings, strengths, weaknesses);
     
+    await simulateProgress(0.95, 'Finalizing results', 2);
+    onProgress(0.95, 'Finalizing results', 5);
+    
     // Combine everything into the final result
     const finalResult = {
       jobId,
@@ -123,11 +142,12 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
         documentTitle,
         documentPages: 12, // This would be determined from the actual PDF
         promptUsed: prompt,
-        processingTime: Math.floor(Math.random() * 200) + 100 // simulate processing time
+        processingTime: selectedAgents.length * simulatedTimePerAgent + 10 // Simulated processing time
       }
     };
     
-    // Complete the job
+    // Complete the job after a final small delay
+    await simulateProgress(1.0, 'Analysis complete', 1);
     onProgress(1.0, 'Analysis complete', 0);
     onComplete(finalResult);
     
@@ -135,6 +155,14 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     console.error('Error processing document:', error);
     onError(error instanceof Error ? error : new Error(String(error)));
   }
+}
+
+// Helper function to simulate delay with promise
+function simulateProgress(progress: number, stage: string, seconds: number): Promise<void> {
+  return new Promise(resolve => {
+    console.log(`Simulating progress: ${stage} (${Math.round(progress * 100)}%)`);
+    setTimeout(resolve, seconds * 1000);
+  });
 }
 
 // Helper functions for generating the final report

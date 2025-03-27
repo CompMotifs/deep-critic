@@ -80,72 +80,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'pending'
       });
       
-      // Extract text content from PDF
-      const pdfContent = req.file.buffer.toString('base64');
+      // Extract text content from PDF (req.file is checked for existence in the validation above)
+      const pdfContent = req.file?.buffer.toString('base64');
       
       // Begin async processing
-      processDocument({
-        jobId,
-        documentTitle: req.file.originalname,
-        pdfContent,
-        prompt,
-        selectedAgents: agents,
-        onProgress: (progress, stage, timeRemaining) => {
-          // Update job status in memory
-          const jobStatus: JobStatus = {
-            progress,
-            stage,
-            estimatedTimeRemaining: timeRemaining,
-            status: 'processing'
-          };
-          activeJobs.set(jobId, jobStatus);
-          
-          // Send WebSocket update to clients
-          sendJobUpdate(jobId, jobStatus);
-        },
-        onComplete: async (result) => {
-          // Update job status in memory
-          const jobStatus: JobStatus = {
-            progress: 1,
-            stage: 'Complete',
-            estimatedTimeRemaining: 0,
-            status: 'completed',
-            result // Store the result
-          };
-          activeJobs.set(jobId, jobStatus);
-          
-          // Store the result in database
-          try {
-            // We would normally save to the database here, but for simplicity
-            // in the demo we'll just keep it in memory
+      setTimeout(() => {
+        // Call processDocument in a setTimeout to ensure it doesn't block
+        processDocument({
+          jobId,
+          documentTitle: req.file?.originalname || 'Untitled Document',
+          pdfContent,
+          prompt,
+          selectedAgents: agents,
+          onProgress: (progress, stage, timeRemaining) => {
+            // Update job status in memory
+            const jobStatus: JobStatus = {
+              progress,
+              stage,
+              estimatedTimeRemaining: timeRemaining,
+              status: 'processing',
+              // Add agent statuses to show individual agent progress
+              agentStatuses: Object.fromEntries(
+                agents.map(agent => [agent, 
+                  progress < 0.2 ? 'waiting' : 
+                  progress >= 0.9 ? 'completed' : 
+                  'processing'
+                ])
+              )
+            };
+            activeJobs.set(jobId, jobStatus);
             
-            // Send WebSocket completion notification
+            // Send WebSocket update to clients
+            sendJobUpdate(jobId, jobStatus);
+            console.log(`Job ${jobId} progress: ${Math.round(progress * 100)}% - ${stage}`);
+          },
+          onComplete: async (result) => {
+            // Update job status in memory
+            const jobStatus: JobStatus = {
+              progress: 1,
+              stage: 'Complete',
+              estimatedTimeRemaining: 0,
+              status: 'completed',
+              result, // Store the result
+              agentStatuses: Object.fromEntries(
+                agents.map(agent => [agent, 'completed'])
+              )
+            };
+            activeJobs.set(jobId, jobStatus);
+            
+            // Store the result in database
+            try {
+              // We would normally save to the database here, but for simplicity
+              // in the demo we'll just keep it in memory
+              
+              // Send WebSocket completion notification
+              sendJobUpdate(jobId, {
+                ...jobStatus,
+                message: 'Analysis complete'
+              });
+              console.log(`Job ${jobId} completed successfully`);
+            } catch (error) {
+              console.error('Failed to save job result:', error);
+            }
+          },
+          onError: (error) => {
+            // Update job status in memory
+            const jobStatus: JobStatus = {
+              progress: 0,
+              stage: 'Failed',
+              estimatedTimeRemaining: 0,
+              status: 'failed',
+              error: error.message,
+              agentStatuses: Object.fromEntries(
+                agents.map(agent => [agent, 'failed'])
+              )
+            };
+            activeJobs.set(jobId, jobStatus);
+            
+            // Send WebSocket error notification
             sendJobUpdate(jobId, {
               ...jobStatus,
-              message: 'Analysis complete'
+              message: 'Analysis failed'
             });
-          } catch (error) {
-            console.error('Failed to save job result:', error);
+            console.error(`Job ${jobId} failed: ${error.message}`);
           }
-        },
-        onError: (error) => {
-          // Update job status in memory
-          const jobStatus: JobStatus = {
-            progress: 0,
-            stage: 'Failed',
-            estimatedTimeRemaining: 0,
-            status: 'failed',
-            error: error.message
-          };
-          activeJobs.set(jobId, jobStatus);
-          
-          // Send WebSocket error notification
-          sendJobUpdate(jobId, {
-            ...jobStatus,
-            message: 'Analysis failed'
-          });
-        }
-      });
+        }).catch(error => {
+          console.error('Uncaught error in processDocument:', error);
+        });
+      }, 100);
       
       // Return job ID for the client to use for status updates
       return res.status(202).json({ 
