@@ -45,54 +45,65 @@ class PROMPT(BaseModel):
         "Summarize the paper motivation, key contributions and achievements in a paragraph."
     )
 
-    q2_strengths_statement: str = (
-        "2. Strengths: List the strengths of the submission. "
-        "For instance, it could be about the soundness of the theoretical claim or the soundness of empirical methodology used to validate an empirical approach. "
-        "Another important axis is the significance and the novelty of the contributions relative to what has been done already in the literature, and here you may want to cite these relevant prior works. "
-        "One measure of the significance of a contribution is (your belief about) the level to which researchers or practitioners will make use of or be influenced by the proposed ideas. "
-        "Solid, technical papers that explore new territory or point out new directions for research are preferable to papers that advance the state of the art, but only incrementally. "
-        "Finally, a possible strength is the relevance of the line of work for the community."
+    q2_soundness_statement: str = (
+        "Soundness: Evaluate the theoretical or methodological soundness of the submission. Score between 1 and 5 as stated below. Give 1 or 5 in very exceptionally bad or amazing cases\n"
+        "1:poor\n"
+        "2:fair\n"
+        "3:good\n"
+        "4:excellent\n"
+        "5:exceptional\n"
+
     )
 
-    q3_weaknesses_statement: str = (
-        "3. Weaknesses: This is like above, but now focussing on the limitations of this work."
-        "Your comments should be detailed, specific, and polite. Please avoid vague, subjective complaints. "
-        "Always be constructive and help the authors understand your viewpoint, without being dismissive or using inappropriate language. "
-        "Remember that you are not reviewing your level of interest in the submission, but its scientific contribution to the field!"
+    q3_presentation_statement: str = (
+        "Presentation: Evaluate the quality of the presnetation in the paper. Score between 1 and 5 as stated below. Give 1 or 5 in very exceptionally bad or amazing cases\n"
+        "1:poor\n"
+        "2:fair\n"
+        "3:good\n"
+        "4:excellent\n"
+        "5:exceptional\n"
+
     )
 
-    q4_correctness_statement: str = (
-        "4. Correctness: Are the claims and method correct? Is the empirical methodology correct? "
-        "Explain if there is anything incorrect with the paper. Incorrect claims or methodology are the primary reason for rejection. "
-        "Be as detailed, specific and polite as possible. Thoroughly motivate your criticism so that authors will understand your point of view and potentially respond to you."
+    q4_contribution_statement: str = (
+        "Contribution: Evaluate the contribution this paper makes to the community and the scientific field. Score between 1 and 5 as stated below. Give 1 or 5 in very exceptionally bad or amazing cases\n"
+        "1:poor\n"
+        "2:fair\n"
+        "3:good\n"
+        "4:excellent\n"
+        "5:exceptional\n"
+
     )
 
-    q5_clarity_statement: str = (
-        "5. Clarity: Is the paper well written? "
-        "Rate the clarity of exposition of the paper. Give examples of what parts of the paper need revision to improve clarity."
+    q5_strengths_statement: str = (
+        "Strengths: List the strengths of the submission.  \n"
+        "For instance, it could be about the soundness of the theoretical claim or the soundness of empirical methodology used to validate an empirical approach. \n "
+        "Another important axis is the significance and the novelty of the contributions relative to what has been done already in the literature, and here you may want to cite these relevant prior works. \n "
+        "One measure of the significance of a contribution is (your belief about) the level to which researchers or practitioners will make use of or be influenced by the proposed ideas. \n "
+        "Solid, technical papers that explore new territory or point out new directions for research are preferable to papers that advance the state of the art, but only incrementally.  \n"
+        "Finally, a possible strength is the relevance of the line of work for the community. \n"
     )
 
-    q6_relation_to_prior_work_statement: str = (
-        "6. Relation to prior work: Is it clearly discussed how this work differs from previous contributions? "
-        "Explain whether the submission is written with the due scholarship, relating the proposed work with the prior work in the literature. "
-        "The related work section should not just list prior work, but explain how the proposed work differs from prior work appeared in the literature. "
-        "Note that authors are excused for not knowing about all non-refereed work (e.g, those appearing on ArXiv). "
-        "Papers (whether refereed or not) appearing less than two months before the submission deadline are considered contemporaneous to NeurIPS submissions; authors are not obligated to make detailed comparisons to such papers (though, especially for the camera ready versions of accepted papers, authors are encouraged to)."
+    q6_weaknesses_statement: str = (
+        "Weaknesses: This is like above, but now focussing on the weaknesses of this work. \n"
+        "Your comments should be detailed, specific, and polite. Please avoid vague, subjective complaints.  \n"
+        "Always be constructive and help the authors understand your viewpoint, without being dismissive or using inappropriate language.  \n"
+        "Remember that you are not reviewing your level of interest in the submission, but its scientific contribution to the field! \n"
     )
 
-    q7_reproducibility_statement: str = (
-        "7. Reproducibility: Are there enough details to reproduce the major results of this work? "
-        "Mark whether the work is reasonably reproducible. If it is not, lack of reproducibility should be listed among the weaknesses of the submission."
+
+    q7_limitations_statement: str = (
+        "Limitations: This is like above, but now focussing on the limitations of this work. \n "
+        "Read the limitations sections of the paper and anayse it. \n"
+        "Focus mainly on this work and it's limitations, not on the limitations of the field in general. \n"
+        "Note that authors are excused for not knowing about all non-refereed work (e.g, those appearing on ArXiv). \n"
     )
 
-    q8_additional_feedback_statement: str = (
-        "8. Additional feedback, comments, suggestions for improvement and questions for the authors."
-        " Add here any additional comment you might have about the submission, including questions and suggestions for improvement."
-    )
 
-    q9_overall_score_statement: str = (
-        "9. Overall score: \n"
-        "The 'Overall Score' for each submission should reflect your assessment of the submissions contributions. "
+
+    q8_rating_statement: str = (
+        "Rating: \n"
+        "The Rating is the overal score for each submission which should reflect your assessment of the submissions contributions. Score between 1 and 10 as stated below.\n "
         "10: Truly groundbreaking work. \n "
         "9: An excellent submission; a strong accept. \n "
         "8: A very good submission; a clear accept. \n "
@@ -106,21 +117,12 @@ class PROMPT(BaseModel):
     )
 
     q10_confidence_score_statement: str = (
-        "10. Confidence score: \n "
+        "Confidence score: \n "
         "5: You are absolutely certain about your assessment. You are very familiar with the related work. \n "
         "4: You are confident in your assessment, but not absolutely certain. It is unlikely, but not impossible, that you did not understand some parts of the submission or that you are unfamiliar with some pieces of related work. \n "
         "3: You are fairly confident in your assessment.  It is possible that you did not understand some parts of the submission or that you are unfamiliar with some pieces of related work. Math/other details were not carefully checked. \n "
         "2: You are willing to defend your assessment, but it is quite likely that you did not understand central parts of the submission or that you are unfamiliar with some pieces of related work. Math/other details were not carefully checked. \n "
-        "1: Your assessment is an educated guess. The submission is not in your area or the submission was difficult to understand. Math/other details were not carefully checked."
-    )
-
-    q12_ethical_concerns_statement: str = (
-        "11. Does the submission raise potential ethical concerns? "
-        "This includes methods, applications, or data that create or reinforce unfair bias or that have a primary purpose of harm or injury. "
-        "If so, please explain briefly. \n"
-        "Yes or No. Explain if the submission might raise any potential ethical concern. Note that your rating should be independent of this. "
-        "If the AC also shares this concern, dedicated reviewers with expertise at the intersection of ethics and ML will further review the submission. "
-        "Your duty here is to flag only papers that might need this additional revision step."
+        "1: Your assessment is an educated guess. The submission is not in your area or the submission was difficult to understand. Math/other details were not carefully checked. \n"
     )
 
     def __str__(self) -> str:
@@ -147,7 +149,6 @@ class PROMPT(BaseModel):
             '  "contribution": [1-5],  // Integer from 1-5 evaluating significance of contributions\n'
             '  "strengths": "<Bullet-point list of the paper\'s main strengths>",\n'
             '  "weaknesses": "<Bullet-point list of the paper\'s main weaknesses>",\n'
-            '  "questions": "<Any questions or clarifications for the authors>",\n'
             '  "limitations": "<Discussion of limitations or potential issues>",\n'
             '  "rating": [1-10],        // Integer from 1-10 overall score (10 is highest)\n'
             '  "confidence": [1-5]     // Integer from 1-5 confidence in your assessment\n'
@@ -160,7 +161,6 @@ class PROMPT(BaseModel):
             "- contribution: Score from 1-5 (5 is best) for the significance and novelty of the work\n"
             "- strengths: List the main strengths, being specific and substantive\n"
             "- weaknesses: List the main weaknesses, being constructive and specific\n"
-            "- questions: Include any questions you have for the authors (can be empty string if none)\n"
             "- limitations: Describe limitations of the work or methodology (can be empty string if negligible)\n"
             "- rating: Overall score from 1-10 (10 is best) reflecting your assessment of the submission\n"
             "- confidence: Score from 1-5 (5 is highest) indicating your confidence in your assessment\n\n"
