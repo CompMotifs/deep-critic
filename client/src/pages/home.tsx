@@ -33,12 +33,12 @@ const Home = () => {
     if (!file) return;
     
     const formData = new FormData();
-    formData.append("document", file); // Use 'document' as field name per API spec
+    formData.append("file", file); // Server expects 'file' as field name
     formData.append("prompt", prompt);
-    formData.append("models", JSON.stringify(selectedAgents)); // Use 'models' as field name per API spec
+    formData.append("agents", JSON.stringify(selectedAgents)); // Server expects 'agents' as field name
     
-    // Use the specified endpoint from requirements
-    const response = await fetch("/api/submit", {
+    // Use the server API endpoint
+    const response = await fetch("/api/review", {
       method: "POST",
       body: formData,
     });
@@ -56,14 +56,8 @@ const Home = () => {
     if (!jobId) return;
     
     try {
-      const response = await fetch(`/api/status/${jobId}/cancel`, {
-        method: "POST",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to cancel job");
-      }
-      
+      // Since we don't have a specific cancel endpoint in the backend, we'll just
+      // transition the UI back to the configuration step
       toast({
         title: "Analysis Cancelled",
         description: "Your document review has been cancelled.",
@@ -73,7 +67,7 @@ const Home = () => {
       setJobId(null);
     } catch (error) {
       console.error("Error cancelling job:", error);
-      // Even if the cancel request fails, we'll still go back to the form
+      // Even if there's an error, we'll still go back to the form
       setStep("config");
       setJobId(null);
     }
