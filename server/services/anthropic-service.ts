@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { DocumentAnalysisOptions, DocumentAnalysisResult } from '../../shared/types';
 
 // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
 
@@ -7,17 +8,12 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || 'dummy-key-for-development',
 });
 
-interface DocumentAnalysisOptions {
-  model: string;
-  content: string; // base64 encoded document content
-  prompt: string;
-}
-
-export async function analyzeDocument(options: DocumentAnalysisOptions): Promise<{
-  feedback: string;
-  confidence: number;
-  keyPoints: string[];
-}> {
+/**
+ * Analyzes a document using Anthropic Claude API
+ * @param options The options for document analysis
+ * @returns Analysis result from Claude
+ */
+export async function analyzeDocument(options: DocumentAnalysisOptions): Promise<DocumentAnalysisResult> {
   const { model, content, prompt } = options;
   
   // For development, return mock data to avoid API issues
@@ -27,11 +23,7 @@ export async function analyzeDocument(options: DocumentAnalysisOptions): Promise
 }
 
 // Mock analysis for development without API key
-function getMockAnalysis(model: string): {
-  feedback: string;
-  confidence: number;
-  keyPoints: string[];
-} {
+function getMockAnalysis(model: string): DocumentAnalysisResult {
   if (model.includes('opus')) {
     return {
       feedback: "This is a well-executed research paper that makes a meaningful contribution to the field. The experimental design shows careful consideration of potential confounding variables, and the statistical methods are appropriate for the research questions.\n\nThe paper excels in connecting findings to existing literature and clearly articulating the theoretical implications. The primary weaknesses are some minor inconsistencies in data presentation and limited consideration of alternative interpretations of the results.",
@@ -41,7 +33,8 @@ function getMockAnalysis(model: string): {
         "Excellent handling of potential confounding variables.",
         "Consider exploring alternative interpretations of the findings in section 5.",
         "Data presentation inconsistencies should be resolved before publication."
-      ]
+      ],
+      timestamp: new Date().toISOString()
     };
   } else if (model.includes('sonnet')) {
     return {
@@ -51,7 +44,8 @@ function getMockAnalysis(model: string): {
         "The methodology is well-described and appropriate for the research questions.",
         "Conclusions are generally well-supported by the evidence presented.",
         "Data inconsistencies in Tables 3-4 need to be addressed."
-      ]
+      ],
+      timestamp: new Date().toISOString()
     };
   } else {
     return {
@@ -61,7 +55,8 @@ function getMockAnalysis(model: string): {
         "Clear organization and accessible writing style.",
         "Supporting evidence needs strengthening in some sections.",
         "Discussion of limitations needs expansion."
-      ]
+      ],
+      timestamp: new Date().toISOString()
     };
   }
 }

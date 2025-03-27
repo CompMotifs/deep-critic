@@ -1,16 +1,7 @@
 import * as AnthropicService from './anthropic-service';
 import * as DeepSeekService from './deepseek-service';
-
-interface ProcessDocumentOptions {
-  jobId: string;
-  documentTitle: string;
-  pdfContent: string; // base64 encoded PDF
-  prompt: string;
-  selectedAgents: string[];
-  onProgress: (progress: number, stage: string, timeRemaining: number) => void;
-  onComplete: (result: any) => void;
-  onError: (error: Error) => void;
-}
+import * as OpenAIService from './openai-service';
+import { ProcessDocumentOptions, AgentResult, AnalysisResult } from '../../shared/types';
 
 export async function processDocument(options: ProcessDocumentOptions): Promise<void> {
   const {
@@ -93,12 +84,11 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
             prompt: prompt
           });
         } else if (agentConfig.service === 'openai') {
-          // For demo purposes, use Anthropic service for OpenAI models too
-          console.log(`Using Anthropic service as a stand-in for OpenAI model: ${agentConfig.model}`);
-          result = await AnthropicService.analyzeDocument({
-            model: 'claude-3-7-sonnet-20250219', // Use Claude as a stand-in
+          // Process with OpenAI
+          result = await OpenAIService.analyzeDocument({
+            model: agentConfig.model,
             content: pdfContent,
-            prompt: `[This analysis is simulating ${agentConfig.name}]\n\n${prompt}`
+            prompt: prompt
           });
         } else if (agentConfig.service === 'mistral') {
           // For demo purposes, use Anthropic service for Mistral models too
@@ -206,13 +196,14 @@ function simulateProgress(progress: number, stage: string, seconds: number): Pro
 }
 
 // Helper functions for generating the final report
-function extractKeyFindings(agentResults: any[]): any[] {
+function extractKeyFindings(agentResults: AgentResult[]): Array<{ type: string; text: string }> {
   // In a real implementation, this would analyze all agent outputs
   // and extract common findings
   
-  // Check if DeepSeek models were used
+  // Check which models were used
   const hasDeepSeek = agentResults.some(agent => agent.agentName.includes("DeepSeek") && !agent.agentName.includes("Coder"));
   const hasDeepSeekCoder = agentResults.some(agent => agent.agentName.includes("DeepSeek Coder"));
+  const hasGPT4 = agentResults.some(agent => agent.agentName.includes("GPT-4"));
   
   const baseFindings = [
     { type: "strength", text: "The methodology is robust and well-described, with appropriate statistical analyses." },
@@ -233,15 +224,23 @@ function extractKeyFindings(agentResults: any[]): any[] {
     );
   }
   
+  if (hasGPT4) {
+    baseFindings.push(
+      { type: "strength", text: "GPT-4 analysis emphasized the strong methodological framework and technical rigor." },
+      { type: "concern", text: "GPT-4 noted that some visualizations need additional context and explanation for maximum impact." }
+    );
+  }
+  
   return baseFindings;
 }
 
-function extractStrengthsWeaknesses(agentResults: any[]): { strengths: string[], weaknesses: string[] } {
+function extractStrengthsWeaknesses(agentResults: AgentResult[]): { strengths: string[], weaknesses: string[] } {
   // In a real implementation, this would analyze all agent outputs
   
-  // Check if DeepSeek models were used
+  // Check which models were used
   const hasDeepSeek = agentResults.some(agent => agent.agentName.includes("DeepSeek") && !agent.agentName.includes("Coder"));
   const hasDeepSeekCoder = agentResults.some(agent => agent.agentName.includes("DeepSeek Coder"));
+  const hasGPT4 = agentResults.some(agent => agent.agentName.includes("GPT-4"));
   
   const baseStrengths = [
     "Clear and logical structure throughout the document",
@@ -276,13 +275,28 @@ function extractStrengthsWeaknesses(agentResults: any[]): { strengths: string[],
     );
   }
   
+  if (hasGPT4) {
+    baseStrengths.push(
+      "Excellent methodological framework with clear research design (noted by GPT-4)",
+      "Strong technical analysis with appropriate statistical techniques (noted by GPT-4)"
+    );
+    
+    baseWeaknesses.push(
+      "Visualizations need additional context in some cases (noted by GPT-4)",
+      "Some complex concepts would benefit from more engaging presentation (noted by GPT-4)"
+    );
+  }
+  
   return {
     strengths: baseStrengths,
     weaknesses: baseWeaknesses
   };
 }
 
-function generateComparisonAspects(agentResults: any[]): any[] {
+function generateComparisonAspects(agentResults: AgentResult[]): Array<{
+  name: string;
+  values: Record<string, string>;
+}> {
   // In a real implementation, this would create a comparison table
   // based on different agents' assessments
   const aspects = [];
@@ -343,13 +357,19 @@ function generateComparisonAspects(agentResults: any[]): any[] {
   return aspects;
 }
 
-function generateSummary(agentResults: any[], keyFindings: any[], strengths: string[], weaknesses: string[]): string {
+function generateSummary(
+  agentResults: AgentResult[], 
+  keyFindings: Array<{ type: string; text: string }>, 
+  strengths: string[], 
+  weaknesses: string[]
+): string {
   // In a real implementation, this would be generated by a meta-analysis of all agents
   
   // Check if specific models were used
   const hasClaudeOpus = agentResults.some(agent => agent.agentName.includes("Opus"));
   const hasDeepSeek = agentResults.some(agent => agent.agentName.includes("DeepSeek"));
   const hasDeepSeekCoder = agentResults.some(agent => agent.agentName.includes("DeepSeek Coder"));
+  const hasGPT4 = agentResults.some(agent => agent.agentName.includes("GPT-4"));
   
   let summaryText = "This document demonstrates strong methodological rigor and presents novel findings in the field. ";
   
@@ -363,6 +383,10 @@ function generateSummary(agentResults: any[], keyFindings: any[], strengths: str
   
   if (hasDeepSeekCoder) {
     summaryText += "DeepSeek Coder provided a thorough technical review, identifying both implementation strengths and opportunities for code optimization and documentation improvement. ";
+  }
+  
+  if (hasGPT4) {
+    summaryText += "GPT-4's analysis emphasized the strong methodological framework while noting that some visualizations could benefit from additional context and explanation. ";
   }
   
   summaryText += "All agents agree that the document's conclusions are well-supported by the evidence presented";

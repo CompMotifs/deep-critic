@@ -1,22 +1,13 @@
 import fetch from 'node-fetch';
 
-interface DocumentAnalysisOptions {
-  model: string;
-  content: string; // base64 encoded document content
-  prompt: string;
-}
+import { DocumentAnalysisOptions, DocumentAnalysisResult } from '../../shared/types';
 
 /**
  * Analyzes a document using DeepSeek API
  * @param options The options for document analysis
  * @returns Analysis result from DeepSeek
  */
-export async function analyzeDocument(options: DocumentAnalysisOptions): Promise<{
-  feedback: string;
-  confidence: number;
-  keyPoints: string[];
-  timestamp: string;
-}> {
+export async function analyzeDocument(options: DocumentAnalysisOptions): Promise<DocumentAnalysisResult> {
   // Always return mock data for development purposes
   // In a production environment, we would check for the API key
   return getMockAnalysis(options.model);
@@ -69,12 +60,7 @@ export async function analyzeDocument(options: DocumentAnalysisOptions): Promise
   }
 }
 
-function getMockAnalysis(model: string): {
-  feedback: string;
-  confidence: number;
-  keyPoints: string[];
-  timestamp: string;
-} {
+function getMockAnalysis(model: string): DocumentAnalysisResult {
   return {
     feedback: `This is a mock analysis from DeepSeek ${model}. The document appears to be well-structured with clear arguments and supporting evidence. The writing style is professional and engaging. The analysis shows the document has strong theoretical foundations but could benefit from more practical examples.`,
     confidence: 0.92,

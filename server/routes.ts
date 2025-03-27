@@ -6,6 +6,7 @@ import { z } from "zod";
 import { processDocument } from "./services/pdf-service";
 import crypto from "crypto";
 import { setupWebSocketServer, sendJobUpdate } from "./websocket";
+import { JobStatus } from "../shared/types";
 
 // Setup multer for file uploads
 const upload = multer({
@@ -20,19 +21,6 @@ const upload = multer({
     cb(null, true);
   }
 });
-
-// Define job status type 
-type JobStatus = {
-  progress: number,
-  stage: string,
-  estimatedTimeRemaining: number,
-  status: 'pending' | 'processing' | 'completed' | 'failed',
-  error?: string,
-  result?: any, // Store the result when completed
-  message?: string,
-  promptUsed?: string,
-  agentStatuses?: Record<string, 'waiting' | 'processing' | 'completed' | 'failed'>
-};
 
 // Map to store active job connections
 const activeJobs = new Map<string, JobStatus>();
