@@ -116,7 +116,7 @@ class PROMPT(BaseModel):
         "1: Trivial or wrong or already known. "
     )
 
-    q10_confidence_score_statement: str = (
+    q9_confidence_score_statement: str = (
         "Confidence score: \n "
         "5: You are absolutely certain about your assessment. You are very familiar with the related work. \n "
         "4: You are confident in your assessment, but not absolutely certain. It is unlikely, but not impossible, that you did not understand some parts of the submission or that you are unfamiliar with some pieces of related work. \n "
