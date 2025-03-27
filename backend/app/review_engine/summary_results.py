@@ -30,7 +30,7 @@ def output_summary(output_file_path):
         section_stats[section] = (section_mean, section_sd)
 
     #extract he non-numeric columns
-    non_numeric_unique_columns = {"Summary", "Soundness", "Strengths", "Weaknesses", "Questions", "Limitations"}
+    non_numeric_unique_columns = {"Summary", "Strengths", "Weaknesses", "Limitations"}
     non_numeric_columns = output[[col for col in output.columns if any(substring in col for substring in non_numeric_unique_columns)]]
 
     return section_stats, non_numeric_columns
