@@ -7,6 +7,8 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -46,6 +48,7 @@ export const insertReviewJobSchema = createInsertSchema(reviewJobs).pick({
   documentHash: true,
   prompt: true,
   selectedAgents: true,
+  status: true,
 });
 
 // Document storage schema
@@ -54,6 +57,7 @@ export const documents = pgTable("documents", {
   jobId: integer("job_id").references(() => reviewJobs.id).notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const insertDocumentSchema = createInsertSchema(documents).pick({
@@ -61,12 +65,50 @@ export const insertDocumentSchema = createInsertSchema(documents).pick({
   content: true,
 });
 
-// Export types
-export type User = typeof users.$inferSelect;
+// Define in-memory types that match the database types but with simpler structure
+export interface User {
+  id: number;
+  username: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
-export type ReviewJob = typeof reviewJobs.$inferSelect;
+export interface ReviewJob {
+  id: number;
+  userId?: number | null;
+  documentTitle: string;
+  documentHash: string;
+  prompt: string;
+  selectedAgents: string[];
+  status: string;
+  progress?: number;
+  summary?: string | null;
+  keyFindings?: Array<{type: string, text: string}> | null;
+  strengths?: string[] | null;
+  weaknesses?: string[] | null;
+  comparisonAspects?: Array<{name: string, values: Record<string, string>}> | null;
+  agentResults?: Array<{
+    agentName: string,
+    feedback: string,
+    confidence: number,
+    keyPoints: string[],
+    timestamp: string
+  }> | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type InsertReviewJob = z.infer<typeof insertReviewJobSchema>;
 
-export type Document = typeof documents.$inferSelect;
+export interface Document {
+  id: number;
+  jobId: number;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;

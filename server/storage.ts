@@ -3,8 +3,6 @@ import {
   reviewJobs, type ReviewJob, type InsertReviewJob,
   documents, type Document, type InsertDocument
 } from "@shared/schema";
-import { db } from "./db";
-import { eq, and } from "drizzle-orm";
 
 // Storage interface for the application
 export interface IStorage {
@@ -24,103 +22,120 @@ export interface IStorage {
   getDocument(jobId: number): Promise<Document | undefined>;
 }
 
-// PostgreSQL database storage implementation
-export class DatabaseStorage implements IStorage {
+// In-memory storage implementation
+export class MemStorage implements IStorage {
+  private users: User[] = [];
+  private reviewJobs: ReviewJob[] = [];
+  private documents: Document[] = [];
+  private userIdCounter = 1;
+  private reviewJobIdCounter = 1;
+  private documentIdCounter = 1;
+
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    return this.users.find(user => user.id === id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
+    return this.users.find(user => user.username === username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
+    const id = this.userIdCounter++;
+    const now = new Date();
+    const user: User = {
+      id,
+      createdAt: now,
+      updatedAt: now,
+      username: insertUser.username,
+      password: insertUser.password
+    };
+    this.users.push(user);
     return user;
   }
   
   // ReviewJob methods
   async createReviewJob(job: InsertReviewJob): Promise<ReviewJob> {
-    // Create a cloned object to avoid modifying the original
-    const { selectedAgents, ...rest } = job;
-    
-    // Make sure selectedAgents is a valid string array for PostgreSQL JSONB
+    const id = this.reviewJobIdCounter++;
+    const now = new Date();
+
+    // Make sure selectedAgents is a valid string array 
     let agentsArray: string[] = [];
     
-    if (Array.isArray(selectedAgents)) {
-      agentsArray = selectedAgents.map(agent => String(agent));
-    } else if (selectedAgents) {
+    if (Array.isArray(job.selectedAgents)) {
+      agentsArray = job.selectedAgents.map(agent => String(agent));
+    } else if (job.selectedAgents) {
       // Handle any other case by converting to string array
-      agentsArray = [String(selectedAgents)];
+      agentsArray = [String(job.selectedAgents)];
     }
     
-    // Insert the review job with properly formatted data
-    const [reviewJob] = await db
-      .insert(reviewJobs)
-      .values({
-        ...rest,
-        selectedAgents: agentsArray
-      })
-      .returning();
+    const reviewJob: ReviewJob = {
+      id,
+      createdAt: now,
+      updatedAt: now,
+      userId: job.userId || null,
+      documentTitle: job.documentTitle,
+      documentHash: job.documentHash,
+      prompt: job.prompt,
+      selectedAgents: agentsArray,
+      status: job.status || 'pending',
+      progress: 0,
+      summary: null,
+      keyFindings: null,
+      strengths: null,
+      weaknesses: null,
+      comparisonAspects: null,
+      agentResults: null
+    };
       
+    this.reviewJobs.push(reviewJob);
     return reviewJob;
   }
   
   async getReviewJob(id: number): Promise<ReviewJob | undefined> {
-    const [job] = await db
-      .select()
-      .from(reviewJobs)
-      .where(eq(reviewJobs.id, id));
-    return job || undefined;
+    return this.reviewJobs.find(job => job.id === id);
   }
   
   async updateReviewJob(id: number, updates: Partial<ReviewJob>): Promise<ReviewJob | undefined> {
-    const [updatedJob] = await db
-      .update(reviewJobs)
-      .set({
-        ...updates,
-        updatedAt: new Date()
-      })
-      .where(eq(reviewJobs.id, id))
-      .returning();
-    return updatedJob || undefined;
+    const jobIndex = this.reviewJobs.findIndex(job => job.id === id);
+    if (jobIndex === -1) return undefined;
+    
+    const job = this.reviewJobs[jobIndex];
+    const updatedJob: ReviewJob = {
+      ...job,
+      ...updates,
+      updatedAt: new Date()
+    };
+    
+    this.reviewJobs[jobIndex] = updatedJob;
+    return updatedJob;
   }
   
   async getReviewJobsForUser(userId: number): Promise<ReviewJob[]> {
-    return await db
-      .select()
-      .from(reviewJobs)
-      .where(eq(reviewJobs.userId, userId));
+    return this.reviewJobs.filter(job => job.userId === userId);
   }
   
   // Document methods
   async saveDocument(document: InsertDocument): Promise<Document> {
-    // Extract and sanitize values to ensure correct types
-    const { jobId, content } = document;
+    const id = this.documentIdCounter++;
+    const now = new Date();
     
-    const [newDocument] = await db
-      .insert(documents)
-      .values({
-        jobId: Number(jobId),
-        content: String(content)
-      })
-      .returning();
+    const newDocument: Document = {
+      id,
+      createdAt: now,
+      updatedAt: now,
+      jobId: Number(document.jobId),
+      content: String(document.content)
+    };
+    
+    this.documents.push(newDocument);
     return newDocument;
   }
   
   async getDocument(jobId: number): Promise<Document | undefined> {
-    const [document] = await db
-      .select()
-      .from(documents)
-      .where(eq(documents.jobId, jobId));
-    return document || undefined;
+    return this.documents.find(doc => doc.jobId === jobId);
   }
 }
 
-export const storage = new DatabaseStorage();
+// Use MemStorage instead of DatabaseStorage
+export const storage = new MemStorage();
