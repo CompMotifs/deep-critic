@@ -31,11 +31,27 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     
     // Map selected agent IDs to actual agent configurations
     const agentConfigs = {
+      // Anthropic Models
       'claude': { model: 'claude-3-7-sonnet-20250219', name: 'Claude 3.7 Sonnet', service: 'anthropic' },
       'opus': { model: 'claude-3-opus-20240229', name: 'Claude 3 Opus', service: 'anthropic' },
-      'mini': { model: 'claude-3-haiku-20240307', name: 'o3-mini-high', service: 'anthropic' },
+      'haiku': { model: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', service: 'anthropic' },
+      
+      // OpenAI Models
+      'gpt4o': { model: 'gpt-4o', name: 'GPT-4o', service: 'openai' },
+      'gpt4': { model: 'gpt-4-turbo', name: 'GPT-4 Turbo', service: 'openai' },
+      'gpt35': { model: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', service: 'openai' },
+      
+      // DeepSeek Models
       'deepseek-lite': { model: 'deepseek-lite', name: 'DeepSeek Lite', service: 'deepseek' },
-      'deepseek-coder': { model: 'deepseek-coder', name: 'DeepSeek Coder', service: 'deepseek' }
+      'deepseek-coder': { model: 'deepseek-coder', name: 'DeepSeek Coder', service: 'deepseek' },
+      
+      // Mistral Models
+      'mistral-large': { model: 'mistral-large', name: 'Mistral Large', service: 'mistral' },
+      'mistral-medium': { model: 'mistral-medium', name: 'Mistral Medium', service: 'mistral' },
+      
+      // Llama Models
+      'llama-3': { model: 'llama-3', name: 'Llama 3', service: 'meta' },
+      'llama-2': { model: 'llama-2', name: 'Llama 2', service: 'meta' }
     };
     
     const selectedAgentConfigs = selectedAgents
@@ -75,6 +91,30 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
             model: agentConfig.model,
             content: pdfContent,
             prompt: prompt
+          });
+        } else if (agentConfig.service === 'openai') {
+          // For demo purposes, use Anthropic service for OpenAI models too
+          console.log(`Using Anthropic service as a stand-in for OpenAI model: ${agentConfig.model}`);
+          result = await AnthropicService.analyzeDocument({
+            model: 'claude-3-7-sonnet-20250219', // Use Claude as a stand-in
+            content: pdfContent,
+            prompt: `[This analysis is simulating ${agentConfig.name}]\n\n${prompt}`
+          });
+        } else if (agentConfig.service === 'mistral') {
+          // For demo purposes, use Anthropic service for Mistral models too
+          console.log(`Using Anthropic service as a stand-in for Mistral model: ${agentConfig.model}`);
+          result = await AnthropicService.analyzeDocument({
+            model: 'claude-3-7-sonnet-20250219', // Use Claude as a stand-in
+            content: pdfContent,
+            prompt: `[This analysis is simulating ${agentConfig.name}]\n\n${prompt}`
+          });
+        } else if (agentConfig.service === 'meta') {
+          // For demo purposes, use Anthropic service for Meta models too
+          console.log(`Using Anthropic service as a stand-in for Meta model: ${agentConfig.model}`);
+          result = await AnthropicService.analyzeDocument({
+            model: 'claude-3-7-sonnet-20250219', // Use Claude as a stand-in
+            content: pdfContent,
+            prompt: `[This analysis is simulating ${agentConfig.name}]\n\n${prompt}`
           });
         } else {
           // Default to Anthropic Claude
