@@ -16,6 +16,10 @@ interface JobStatus {
   message?: string;
   result?: any;
   agentStatuses?: Record<string, 'waiting' | 'processing' | 'completed' | 'failed'>;
+  // Additional properties from the API specification
+  currentModel?: string;
+  completedModels?: string[];
+  remainingModels?: string[];
 }
 
 /**

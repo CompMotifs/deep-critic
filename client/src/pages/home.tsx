@@ -28,27 +28,59 @@ const Home = () => {
     resetForm,
   } = useReviewForm();
 
-  const reviewMutation = useMutation({
-    mutationFn: async () => {
-      if (!file) return;
-      
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("prompt", prompt);
-      formData.append("agents", JSON.stringify(selectedAgents));
-      
-      const response = await fetch("/api/review", {
+  // API endpoint to submit a document for review
+  const submitDocument = async () => {
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append("document", file); // Use 'document' as field name per API spec
+    formData.append("prompt", prompt);
+    formData.append("models", JSON.stringify(selectedAgents)); // Use 'models' as field name per API spec
+    
+    // Use the specified endpoint from requirements
+    const response = await fetch("/api/submit", {
+      method: "POST",
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || response.statusText);
+    }
+    
+    return await response.json();
+  };
+
+  // Function to cancel a running analysis (if needed)
+  const cancelAnalysis = async () => {
+    if (!jobId) return;
+    
+    try {
+      const response = await fetch(`/api/status/${jobId}/cancel`, {
         method: "POST",
-        body: formData,
       });
       
       if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || response.statusText);
+        throw new Error("Failed to cancel job");
       }
       
-      return await response.json();
-    },
+      toast({
+        title: "Analysis Cancelled",
+        description: "Your document review has been cancelled.",
+      });
+      
+      setStep("config");
+      setJobId(null);
+    } catch (error) {
+      console.error("Error cancelling job:", error);
+      // Even if the cancel request fails, we'll still go back to the form
+      setStep("config");
+      setJobId(null);
+    }
+  };
+
+  const reviewMutation = useMutation({
+    mutationFn: submitDocument,
     onMutate: () => {
       setStep("loading");
     },
@@ -65,9 +97,9 @@ const Home = () => {
         setStep("config");
       }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
-        title: "Error submitting review",
+        title: "Error submitting document",
         description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
@@ -145,6 +177,7 @@ const Home = () => {
               setResult(analysisResult);
               setStep("results");
             }}
+            onCancel={cancelAnalysis}
           />
         )}
 
