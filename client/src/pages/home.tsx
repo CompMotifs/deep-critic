@@ -4,6 +4,7 @@ import PromptConfig from "@/components/prompt-config";
 import AgentSelection from "@/components/agent-selection";
 import LoadingState from "@/components/loading-state";
 import ResultsDashboard from "@/components/results-dashboard";
+import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { useReviewForm } from "@/hooks/use-review-form";
 import { useMutation } from "@tanstack/react-query";
@@ -124,6 +125,10 @@ const Home = () => {
                 />
               </svg>
               <h1 className="text-3xl font-bold text-gray-800">DeepCritic</h1>
+            </div>
+            {/* Add CompMotifs logo */}
+            <div className="flex items-center">
+              <Logo />
             </div>
           </div>
           <p className="mt-2 text-gray-600 max-w-3xl">

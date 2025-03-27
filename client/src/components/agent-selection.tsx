@@ -167,15 +167,6 @@ const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) 
             variant="outline" 
             size="sm" 
             type="button"
-            onClick={handleSelectAll}
-            disabled={selectedAgents.length >= MAX_AGENTS}
-          >
-            Select All
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            type="button"
             onClick={handleClearAll}
             disabled={selectedAgents.length === 0}
           >

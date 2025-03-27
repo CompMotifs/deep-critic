@@ -25,6 +25,10 @@ const PromptConfig = ({
   
   const ideaCritiqueTemplate = "Please analyze this idea for innovation, feasibility, market potential, and possible implementation challenges. Provide constructive feedback and suggestions for improvement.";
   
+  const businessProposalTemplate = "Please evaluate this business proposal for market viability, competitive advantage, financial projections, and overall strategy. Highlight strengths, identify risks, and provide recommendations.";
+  
+  const productDesignTemplate = "Please assess this product design for usability, aesthetics, technical feasibility, and market fit. Evaluate how well it addresses user needs and suggest potential improvements.";
+  
   return (
     <div className="mb-8">
       <h3 className="text-md font-medium text-gray-700 mb-2">Step 2: Enter Review Criteria</h3>
@@ -35,7 +39,7 @@ const PromptConfig = ({
           onChange={handlePromptChange}
           rows={4}
           className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          placeholder="Provide some context for what you want DeepCritic to focus on"
+          placeholder="Describe what you want DeepCritic to focus on, or select a template below. Be specific about aspects you want analyzed."
         />
         <div className="absolute bottom-2 right-2 text-xs text-gray-500">
           {charCount}/{maxChars}
@@ -60,6 +64,24 @@ const PromptConfig = ({
           className="text-xs"
         >
           Critique idea
+        </Button>
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="sm"
+          onClick={() => onPromptChange(businessProposalTemplate)}
+          className="text-xs"
+        >
+          Business proposal
+        </Button>
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="sm"
+          onClick={() => onPromptChange(productDesignTemplate)}
+          className="text-xs"
+        >
+          Product design
         </Button>
       </div>
     </div>

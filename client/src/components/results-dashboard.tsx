@@ -35,6 +35,28 @@ const ResultsDashboard = ({ result, onBack }: ResultsDashboardProps) => {
   
   return (
     <div id="results-section" className="bg-white shadow rounded-lg p-6">
+      <div className="flex items-center mb-3">
+        <Button
+          variant="outline"
+          onClick={onBack}
+          className="flex items-center text-gray-600 mr-4"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-4 w-4 mr-1" 
+            viewBox="0 0 20 20" 
+            fill="currentColor"
+          >
+            <path 
+              fillRule="evenodd" 
+              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" 
+              clipRule="evenodd" 
+            />
+          </svg>
+          Back to Form
+        </Button>
+      </div>
+      
       <div className="flex justify-between items-start mb-6">
         <div>
           <h2 className="text-xl font-semibold text-gray-800">Document Review Results</h2>
@@ -43,7 +65,7 @@ const ResultsDashboard = ({ result, onBack }: ResultsDashboardProps) => {
             Analyzed by {result.agentResults?.length || 0} agents
           </p>
         </div>
-        <div className="flex gap-2">
+        <div>
           <Button
             onClick={handleExportPDF}
             className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition"
@@ -61,13 +83,6 @@ const ResultsDashboard = ({ result, onBack }: ResultsDashboardProps) => {
               />
             </svg>
             Export as PDF
-          </Button>
-          <Button
-            variant="outline"
-            onClick={onBack}
-            className="flex items-center text-gray-600"
-          >
-            Back
           </Button>
         </div>
       </div>
