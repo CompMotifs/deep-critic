@@ -11,6 +11,7 @@ import { useReviewForm } from "@/hooks/use-review-form";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 const Home = () => {
   const { toast } = useToast();
@@ -132,9 +133,19 @@ const Home = () => {
               <Logo />
             </div>
           </div>
-          <p className="mt-2 text-gray-600 max-w-3xl">
-            Get comprehensive document reviews from multiple AI models. Upload your PDF, customize your review criteria, and receive detailed insights.
-          </p>
+          <div className="mt-2 space-y-2 max-w-3xl">
+            <p className="text-gray-600">
+              Teams of AI models working together to give you feedback on your work or the work of others.
+              Upload your PDF, customize your review criteria, and get feedback in seconds.
+            </p>
+            <p className="text-gray-600">
+              <Link href="/about">
+                <span className="text-primary-600 hover:text-primary-700 hover:underline cursor-pointer">
+                  Read about why we built this tool to accelerate science.
+                </span>
+              </Link>
+            </p>
+          </div>
         </header>
 
         {step === "config" && (
