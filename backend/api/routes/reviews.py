@@ -1,15 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, UploadFile, File, HTTPException
-import os
-from api.converters.pdf_to_markdown import convert_pdf_to_markdown
 from api.llms.openai_client import get_openai_review
 from api.llms.claude_client import get_claude_review
 from api.llms.mistral_client import get_mistral_review
-from api.prompts.review_prompt import REVIEW_PROMPT
+from review_prompt import REVIEW_PROMPT
 from marker.converters.pdf import PdfConverter
 from marker.models import create_model_dict
 from marker.output import text_from_rendered
-import io
 import json
 import re
 import tempfile
