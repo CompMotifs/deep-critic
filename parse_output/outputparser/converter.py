@@ -1,6 +1,6 @@
 from openai import OpenAI
 from outputparser.structure import Review
-
+from prompts import prompt
 
 def call_conversion_llm(context: str, prompt: str) -> str:
     """
@@ -26,12 +26,15 @@ def convert_to_openreview(aggregated_data: dict) -> str:
       summary, soundness, presentation, contribution,
       strengths, weaknesses, questions, limitations, rating, confidence
     """
-    # Create a prompt that includes all the aggregated details.
-    context = (
-        "Using the following aggregated feedback, produce a final OpenReview style review "
-        "with the sections: Summary; Soundness, Presentation and Contribution (scores from 1 to 5); "
-        "Strengths and Weaknesses; Questions; Limitations; Rating (score from 1 to 10); Confidence."
-    )
+    # Create an instance of the prompt class to include all details
+    system_context = str(prompt())
+    
+    #context = (
+     #   "Using the following aggregated feedback, produce a final OpenReview style review "
+      #  "with the sections: Summary; Soundness, Presentation and Contribution (scores from 1 to 5); "
+      #  "Strengths and Weaknesses; Questions; Limitations; Rating (score from 1 to 10); Confidence."
+    #)
+    
     prompt = (
         f"Summary: {aggregated_data.get('summary')}\n"
         f"Soundness: {aggregated_data.get('soundness')}\n"
@@ -44,4 +47,4 @@ def convert_to_openreview(aggregated_data: dict) -> str:
         f"Rating: {aggregated_data.get('rating')}\n"
         f"Confidence: {aggregated_data.get('confidence')}\n"
     )
-    return call_conversion_llm(context, prompt)
+    return call_conversion_llm(system_context, prompt)
