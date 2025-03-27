@@ -1,12 +1,12 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.review_engine.orchestrator import ReviewEngine
-from app.review_engine.prompt import REVIEW_PROMPT
+from app.review_engine.prompt import PROMPT
 from pydantic import BaseModel
 
 router = APIRouter()
 
 # Initialize the review engine with our prompt
-review_engine = ReviewEngine(REVIEW_PROMPT)
+review_engine = ReviewEngine(PROMPT)
 
 class PaperTextRequest(BaseModel):
     paper_text: str
