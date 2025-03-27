@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+openai==1.55.3
+anthropic
+requests
+mistralai
+python-dotenv
+marker-pdf
+python-multipart

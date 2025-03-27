@@ -1,4 +1,34 @@
-# Docker Compose configuration for DeepCritic
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app  # For development - auto-reload with code changes
+    env_file:
+      - .env
+    environment:
+      - DEBUG=true
+      # Add other environment variables as needed
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app  # For development - auto-reload with code changes
+    depends_on:
+      - backend
+
+networks:
+  default:
+    name: deep_critic_network# Docker Compose configuration for DeepCritic
 services:
   app:
     build:

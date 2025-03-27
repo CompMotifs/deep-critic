@@ -1,4 +1,6 @@
-node_modules
+*.pyc
+.env
+.DS_storenode_modules
 dist
 .DS_Store
 server/public
