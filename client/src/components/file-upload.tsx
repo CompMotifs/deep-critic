@@ -65,7 +65,7 @@ const FileUpload = ({ file, onFileChange }: FileUploadProps) => {
   
   return (
     <div className="mb-8">
-      <h3 className="text-md font-medium text-gray-700 mb-2">Step 1: Upload Your Document</h3>
+      <h3 className="text-md font-medium text-gray-700 mb-2"><span className="font-bold">Step 1:</span> Upload Your Document</h3>
       
       <div 
         className={`mt-2 border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center transition cursor-pointer ${

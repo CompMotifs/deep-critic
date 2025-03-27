@@ -27,7 +27,7 @@ const PromptConfig = ({
   
   return (
     <div className="mb-8">
-      <h3 className="text-md font-medium text-gray-700 mb-2">Step 2: Enter Review Criteria</h3>
+      <h3 className="text-md font-medium text-gray-700 mb-2"><span className="font-bold">Step 2:</span> Enter Review Criteria</h3>
       <div className="relative">
         <Textarea
           id="review-prompt"

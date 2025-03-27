@@ -159,7 +159,7 @@ const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) 
     <div className="mb-8">
       <div className="flex justify-between items-center mb-2">
         <div>
-          <h3 className="text-md font-medium text-gray-700">Step 3: Select AI Agents</h3>
+          <h3 className="text-md font-medium text-gray-700"><span className="font-bold">Step 3:</span> Select AI Agents</h3>
           <p className="text-xs text-gray-500 mt-1">Select up to {MAX_AGENTS} agents for document analysis</p>
         </div>
         <div className="flex space-x-2">
