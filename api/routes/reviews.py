@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
 from api.converters.pdf_to_markdown import convert_pdf_to_markdown
@@ -5,8 +6,13 @@ from api.llms.openai_client import get_openai_review
 from api.llms.claude_client import get_claude_review
 from api.llms.mistral_client import get_mistral_review
 from api.prompts.review_prompt import REVIEW_PROMPT
+from marker.converters.pdf import PdfConverter
+from marker.models import create_model_dict
+from marker.output import text_from_rendered
+import io
 import json
 import re
+import tempfile
 
 router = APIRouter()
 
@@ -18,27 +24,33 @@ def parse_json_response(response_text):
 
     return json.loads(response_text)
 
+def convert_pdf_bytes_to_markdown(pdf_bytes):
+    with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf:
+        tmp_pdf.write(pdf_bytes)
+        tmp_pdf.flush()
+
+        converter = PdfConverter(artifact_dict=create_model_dict())
+
+        # Run converter on the temporary PDF file path
+        rendered = converter(tmp_pdf.name)
+
+        # Get text (markdown), images, tables
+        markdown_text, _, images = text_from_rendered(rendered)
+
+    return markdown_text, images
+
 @router.post("/upload-and-review")
 async def upload_and_review(pdf_file: UploadFile = File(...)):
-    #///handle request
-    # Save uploaded PDF temporarily
-    pdf_dir = "data/pdfs"
-    os.makedirs(pdf_dir, exist_ok=True)
-    pdf_path = os.path.join(pdf_dir, pdf_file.filename)
-    
+    # Read PDF content directly into memory
     content = await pdf_file.read()
-    with open(pdf_path, "wb") as f:
-        f.write(content)
 
-    # Convert PDF to Markdown
+    # Convert PDF to Markdown directly from memory
     try:
-        markdown_text, images = convert_pdf_to_markdown(pdf_path, output_dir="data/markdown")
+        markdown_text, images = convert_pdf_bytes_to_markdown(content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"PDF conversion failed: {str(e)}")
 
     # Call LLM APIs in parallel for fast response
-    from concurrent.futures import ThreadPoolExecutor
-
     with ThreadPoolExecutor() as executor:
         futures = {
             "openai": executor.submit(get_openai_review, markdown_text, REVIEW_PROMPT),
