@@ -42,15 +42,16 @@ def aggregate_feedback(feedbacks: Review) -> dict:
     # Compute averages
     aggregated = {}
     aggregated["soundness"] = (
-        round(np.mean(soundness_scores)) if soundness_scores else None
+        round(np.mean(soundness_scores), 2) if soundness_scores else None
     )
+    print("soundness", aggregated["soundness"])
     aggregated["presentation"] = (
-        round(np.mean(presentation_scores)) if presentation_scores else None
+        round(np.mean(presentation_scores), 2) if presentation_scores else None
     )
     aggregated["contribution"] = (
-        round(np.mean(contribution_scores)) if contribution_scores else None
+        round(np.mean(contribution_scores), 2) if contribution_scores else None
     )
-    aggregated["rating"] = round(np.mean(rating_scores)) if rating_scores else None
+    aggregated["rating"] = round(np.mean(rating_scores), 2) if rating_scores else None
 
     # Combine text sections
     aggregated["summary"] = " ".join(summaries)

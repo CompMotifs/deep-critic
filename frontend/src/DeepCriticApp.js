@@ -191,7 +191,7 @@ const DeepCriticApp = () => {
           </div>
           <div className="score-box">
             <p>Confidence</p>
-            <p className="score-value">{review.confidence}/5</p>
+            <p className="score-value">{review.confidence}/10</p>
           </div>
         </div>
       </div>

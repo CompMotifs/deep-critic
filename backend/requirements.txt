@@ -7,3 +7,7 @@ mistralai
 python-dotenv
 marker-pdf
 python-multipart
+PyMuPDF
+pdf2image
+pytesseract
+Pillow

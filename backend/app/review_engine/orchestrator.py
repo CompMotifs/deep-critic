@@ -63,6 +63,8 @@ class ReviewEngine:
             try:
                 aggregated_data = aggregate_feedback(parsed_reviews)
                 consensus_review = convert_to_openreview(aggregated_data)
+                # print("aggregated_data", aggregated_data)
+                # print("consensus_review", consensus_review)
             except Exception as e:
                 consensus_review = {"error": f"Failed to generate consensus: {str(e)}"}
         
@@ -192,21 +194,20 @@ class ReviewEngine:
             strengths = "\n".join(review.get("strengths", []))
             weaknesses = "\n".join(review.get("weaknesses", []))
             
-            # Handle optional fields
-            questions = ""
-            if "questions" in review:
-                questions = "\n".join(review.get("questions", []))
+            # Handle optional fields (could be string or list)
+            questions = review.get("questions", [])
+            if isinstance(questions, list):
+                questions = "\n".join(questions)
             
-            limitations = ""
-            if "limitations" in review:
-                limitations = "\n".join(review.get("limitations", []))
+            limitations = review.get("limitations", "")
+            if isinstance(limitations, list):
+                limitations = "\n".join(limitations)
             
-            # Map scores to the expected format
-            scores = review.get("scores", {})
-            soundness = self._scale_score(scores.get("originality", 5))
-            presentation = self._scale_score(scores.get("clarity", 5))
-            contribution = self._scale_score(scores.get("impact", 5))
-            rating = scores.get("overall", 5)
+            # Use scores directly from provided fields
+            soundness = review.get("soundness", 3)
+            presentation = review.get("presentation", 3)
+            contribution = review.get("contribution", 3)
+            rating = review.get("rating", 5)
             
             # Create the formatted text
             formatted = f"""
@@ -219,9 +220,11 @@ class ReviewEngine:
             Questions: {questions}
             Limitations: {limitations}
             Rating: {rating}
-            """
+            """.strip()
             return formatted
-        except Exception:
+        
+        except Exception as e:
+            print(f"Error formatting review: {e}")
             return None
     
     def _scale_score(self, score, from_scale=(1, 10), to_scale=(1, 5)):

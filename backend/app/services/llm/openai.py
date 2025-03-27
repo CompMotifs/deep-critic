@@ -11,9 +11,11 @@ def get_openai_review(paper_text, prompt):
     messages = [
         {"role": "user", "content": f"{prompt}\n\nPaper:\n{paper_text}"}
     ]
+    #print("messages", messages)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=messages,
         temperature=0.3,
     )
+    #print("response", response)
     return response.choices[0].message.content.strip()
