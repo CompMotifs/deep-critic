@@ -34,6 +34,6 @@ def get_updated_claude_review(paper_text, prompt, review1, review2):
             {"role": "user", "content": f"{append_str}\n\n{prompt}\n\nPaper:\n{paper_text}"}
         ],
     )
-    print("prompt", {"role": "user", "content": f"{prompt}\n\nPaper:\n{paper_text}"})
-    print("message.content", message.content)
+    #print("prompt", {"role": "user", "content": f"{prompt}\n\nPaper:\n{paper_text}"})
+    #print("message.content", message.content)
     return message.content[0].text.strip()

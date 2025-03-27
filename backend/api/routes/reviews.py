@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from app.review_engine.orchestrator import ReviewEngine
+from app.review_engine.aggregator import Review
 from app.review_engine.prompt import PROMPT, UPDATE_REVIEW_PROMPT
 from app.services.storage import (
     create_job,
@@ -123,9 +124,7 @@ async def check_job_status(job_id: str):
 
 @router.post("/review-document/{job_id}")
 async def review_document(job_id: str):
-    """Review a processed document (PDF or markdown)"""
     job = get_job(job_id)
-
     if job.get("status") == "not_found":
         raise HTTPException(status_code=404, detail="Job not found")
 
@@ -136,22 +135,21 @@ async def review_document(job_id: str):
         )
 
     try:
-        # Load the markdown from file
         markdown_text = load_markdown(job_id)
         if not markdown_text:
             raise HTTPException(status_code=400, detail="Document content not found")
 
-        # Process the markdown text through the review engine
         result = await review_engine.process_text(markdown_text)
 
-        # Update job with review result status
-        update_job_status(job_id, "reviewed")
+        # Explicitly convert consensus_review to dict
+        if isinstance(result.get('consensus_review'), Review):
+            result['consensus_review'] = vars(result['consensus_review'])
 
+        update_job_status(job_id, "reviewed")
         return result
     except Exception as e:
         update_job_status(job_id, "review_failed", error=str(e))
         raise HTTPException(status_code=500, detail=f"Review process failed: {str(e)}")
-
 
 # Keep original endpoints for backward compatibility
 

@@ -60,7 +60,7 @@ def aggregate_feedback(
     aggregated["soundness"] = (
         round(np.mean(soundness_scores), 2) if soundness_scores else None
     )
-    print("soundness", aggregated["soundness"])
+    #print("soundness", aggregated["soundness"])
     aggregated["presentation"] = (
         round(np.mean(presentation_scores), 2) if presentation_scores else None
     )

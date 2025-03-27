@@ -114,7 +114,7 @@ class ReviewEngine:
                 consensus_review = {"error": f"Failed to generate consensus: {str(e)}"}
 
         return {
-            "original_individual_reviews": individual_reviews,
+            "individual_reviews": individual_reviews,
             "original_similarities": original_similarities,
             "updated_individual_reviews": updated_reviews,
             "updated_similarities": updated_similarities,
