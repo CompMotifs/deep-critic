@@ -45,13 +45,6 @@ const ResultsDashboard = ({ result, onBack }: ResultsDashboardProps) => {
         </div>
         <div className="flex gap-2">
           <Button
-            variant="outline"
-            onClick={onBack}
-            className="flex items-center text-gray-600"
-          >
-            Back
-          </Button>
-          <Button
             onClick={handleExportPDF}
             className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition"
           >
@@ -68,6 +61,13 @@ const ResultsDashboard = ({ result, onBack }: ResultsDashboardProps) => {
               />
             </svg>
             Export as PDF
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onBack}
+            className="flex items-center text-gray-600"
+          >
+            Back
           </Button>
         </div>
       </div>
