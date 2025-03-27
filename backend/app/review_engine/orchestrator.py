@@ -114,10 +114,10 @@ class ReviewEngine:
                 consensus_review = {"error": f"Failed to generate consensus: {str(e)}"}
 
         return {
-            "original_individual_reviews": individual_reviews,
-            "original_similarities": original_similarities,
+            "individual_reviews": individual_reviews,
+            # "original_similarities": original_similarities, # TODO: Needs to be JSON-parseable
             "updated_individual_reviews": updated_reviews,
-            "updated_similarities": updated_similarities,
+            # "updated_similarities": updated_similarities,
             "consensus_review": consensus_review,
         }
 
@@ -321,22 +321,22 @@ class ReviewEngine:
 
             strengths = "\n".join(review.get("strengths", []))
             weaknesses = "\n".join(review.get("weaknesses", []))
-            
+
             # Handle optional fields (could be string or list)
             questions = review.get("questions", [])
             if isinstance(questions, list):
                 questions = "\n".join(questions)
-            
+
             limitations = review.get("limitations", "")
             if isinstance(limitations, list):
                 limitations = "\n".join(limitations)
-            
+
             # Use scores directly from provided fields
             soundness = review.get("soundness", 3)
             presentation = review.get("presentation", 3)
             contribution = review.get("contribution", 3)
             rating = review.get("rating", 5)
-            
+
             # Create the formatted text
             formatted = f"""
             Summary: {summary}
@@ -350,7 +350,7 @@ class ReviewEngine:
             Rating: {rating}
             """.strip()
             return formatted
-        
+
         except Exception as e:
             print(f"Error formatting review: {e}")
             return None
