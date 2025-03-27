@@ -52,7 +52,6 @@ class PROMPT(BaseModel):
         "3:good\n"
         "4:excellent\n"
         "5:exceptional\n"
-
     )
 
     q3_presentation_statement: str = (
@@ -62,7 +61,6 @@ class PROMPT(BaseModel):
         "3:good\n"
         "4:excellent\n"
         "5:exceptional\n"
-
     )
 
     q4_contribution_statement: str = (
@@ -72,7 +70,6 @@ class PROMPT(BaseModel):
         "3:good\n"
         "4:excellent\n"
         "5:exceptional\n"
-
     )
 
     q5_strengths_statement: str = (
@@ -91,15 +88,12 @@ class PROMPT(BaseModel):
         "Remember that you are not reviewing your level of interest in the submission, but its scientific contribution to the field! \n"
     )
 
-
     q7_limitations_statement: str = (
         "Limitations: This is like above, but now focussing on the limitations of this work. \n "
         "Read the limitations sections of the paper and anayse it. \n"
         "Focus mainly on this work and it's limitations, not on the limitations of the field in general. \n"
         "Note that authors are excused for not knowing about all non-refereed work (e.g, those appearing on ArXiv). \n"
     )
-
-
 
     q8_rating_statement: str = (
         "Rating: \n"
@@ -168,5 +162,19 @@ class PROMPT(BaseModel):
         )
 
 
+class UPDATE_REVIEW_PROMPT(BaseModel):
+    "Prompt for updating a review"
+
+    context: str = (
+        "You are updating your review for a research paper. "
+        "You have already provided an initial review and are now revising it based on new information from other reviewers."
+        "Be professional, polite, and listen to the other reviewers, but do not give in to undue influence."
+    )
+
+    def __str__(self) -> str:
+        return self.context
+
+
 # Create the prompt instance - the router code initializes the ReviewEngine with PROMPT
 PROMPT = PROMPT()
+UPDATE_REVIEW_PROMPT = UPDATE_REVIEW_PROMPT()

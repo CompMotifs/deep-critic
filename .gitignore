@@ -1,3 +1,31 @@
+#Frontend
+/frontend/node_modules/
+/frontend/build/
+/frontend/.env
+/frontend/.cache
+/frontend/npm-debug.log*
+/frontend/yarn-error.log
+/frontend/package-lock.json # Remove this line if you want to commit it (recommended to commit)
+
+# Python (backend)
+__pycache__/
 *.pyc
+/backend/.env
+/backend/env/
+/backend/venv/
+/backend/tmp_storage/
+*.sqlite3
+*.log
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# System files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Misc
 .env
-.DS_store

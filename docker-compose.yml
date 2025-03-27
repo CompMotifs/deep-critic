@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -8,24 +6,30 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app  # For development - auto-reload with code changes
+      - ./backend:/app
+      - ./tmp_storage:/app/tmp_storage
     env_file:
       - .env
     environment:
       - DEBUG=true
-      # Add other environment variables as needed
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
+    networks:
+      - deep_critic_network
 
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app  # For development - auto-reload with code changes
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
+    networks:
+      - deep_critic_network
 
 networks:
-  default:
+  deep_critic_network:
     name: deep_critic_network
