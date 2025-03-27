@@ -1,3 +1,8 @@
 *.pyc
 .env
-.DS_store
+.DS_storenode_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz

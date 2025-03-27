@@ -28,4 +28,22 @@ services:
 
 networks:
   default:
-    name: deep_critic_network
+    name: deep_critic_network# Docker Compose configuration for DeepCritic
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:5000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/deepcritic
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-dummy-key-for-development}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-dummy-key-for-development}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-dummy-key-for-development}
+    restart: unless-stopped
+    # Simple command that uses a sleep instead of netcat
+    command: >
+      bash -c "
+        npm run dev
+      "

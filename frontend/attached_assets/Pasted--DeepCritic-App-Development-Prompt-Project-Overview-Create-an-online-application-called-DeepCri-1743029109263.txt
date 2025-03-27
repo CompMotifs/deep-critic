@@ -1,0 +1,149 @@
+# DeepCritic App Development Prompt
+
+## Project Overview
+Create an online application called DeepCritic that enables users to receive document reviews from an ensemble of language model agents. The app will analyze uploaded PDF documents based on user-specified criteria and generate a comprehensive review dashboard that can be downloaded as a PDF.
+
+## Core Functionality
+1. Allow users to upload PDF documents
+2. Accept custom review prompts/criteria from users
+3. Let users select which AI agents to include in the review ensemble
+4. Process documents through the selected agents
+5. Generate and display a unified review dashboard
+6. Enable dashboard export as PDF
+
+## Frontend Requirements
+
+### UI Components
+- **Document Upload Section**
+  - Drag-and-drop area for PDF files
+  - File size validation and preview
+  - Support for file selection via browser dialog
+
+- **Prompt Configuration**
+  - Text area for users to enter specific review criteria
+  - Character counter with reasonable limits
+  - Sample prompts or placeholder text for guidance
+
+- **Agent Selection**
+  - Checkboxes or toggle switches for available agents
+  - Include options for:
+    - Claude 3.7 Sonnet
+    - Claude 3 Opus
+    - Other LLM options (o3-mini-high, etc.)
+  - Brief description of each agent's strengths
+
+- **Action Button**
+  - Prominent "DeepCritic Search" button
+  - Disabled state when form is incomplete
+
+- **Loading Interface**
+  - Progress indicators showing current stage
+  - Estimated time remaining
+  - Visual representation of which agents are currently processing
+
+- **Results Dashboard**
+  - Summary section with key findings
+  - Individual agent feedback sections
+  - Interactive elements to compare agent responses
+  - PDF export button with formatting options
+
+### Design Guidelines
+- Clean, professional interface with intuitive navigation
+- Responsive design that works across devices
+- Accessibility compliance (WCAG standards)
+- Clear visual hierarchy with focus on content
+- Color-coding for different agents' feedback
+
+## Data Flow Architecture
+
+### Client-Side Flow
+1. User uploads PDF → Frontend validates file format/size
+2. User configures review parameters and selects agents
+3. Frontend sends request to backend with file and parameters
+4. Frontend displays loading state with real-time updates
+5. Frontend receives and renders results
+6. User can interact with and export dashboard
+
+### Backend Integration Points
+- Endpoint for PDF upload and validation
+- API for submitting review jobs
+- WebSocket or polling mechanism for status updates
+- Results retrieval endpoint
+- PDF generation service
+
+### Data Structures
+- **Request Payload Structure**
+  ```json
+  {
+    "document": "[binary_data]",
+    "prompt": "string",
+    "selectedAgents": ["agent1", "agent2", ...],
+    "jobId": "uuid"
+  }
+  ```
+
+- **Status Update Structure**
+  ```json
+  {
+    "jobId": "uuid",
+    "progress": 0.65,
+    "currentStage": "Analyzing with Claude 3.7 Sonnet",
+    "estimatedTimeRemaining": 120,
+    "completedAgents": ["agent1"],
+    "pendingAgents": ["agent2", "agent3"]
+  }
+  ```
+
+- **Results Structure**
+  ```json
+  {
+    "jobId": "uuid",
+    "summary": "string",
+    "agentResults": [
+      {
+        "agentName": "string",
+        "feedback": "string",
+        "confidence": 0.85,
+        "keyPoints": ["string", "string", ...],
+        "timestamp": "datetime"
+      },
+      ...
+    ],
+    "metadata": {
+      "documentTitle": "string",
+      "documentPages": 12,
+      "promptUsed": "string",
+      "processingTime": 245
+    }
+  }
+  ```
+
+## Technical Stack Recommendations
+- **Frontend**: React with Tailwind CSS or Material UI
+- **State Management**: React Context or Redux
+- **PDF Handling**: PDF.js for preview, jsPDF for export
+- **Backend Communication**: Axios or Fetch API with WebSockets
+
+## Implementation Phases
+1. **Phase 1**: Create basic UI components and layout
+2. **Phase 2**: Implement PDF upload and preview
+3. **Phase 3**: Build agent selection interface
+4. **Phase 4**: Develop loading state with mock data
+5. **Phase 5**: Design and implement results dashboard
+6. **Phase 6**: Add PDF export functionality
+7. **Phase 7**: Connect to backend endpoints (placeholders until backend is ready)
+
+## Testing Guidelines
+- Unit tests for all components
+- Integration tests for form submission flow
+- Simulated API responses for testing loading states
+- Cross-browser compatibility testing
+- Performance testing with large PDF files
+
+## Placeholder Backend (for development)
+Include mock responses for:
+- Document upload success/failure
+- Processing status updates
+- Sample results from different agents
+
+This will allow frontend development to proceed independently while the actual backend is being built.
