@@ -19,7 +19,7 @@ Deep Critic is an API that leverages multiple Large Language Models (LLMs) to pr
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/deep-critic.git
+git clone https://github.com/CompMotifs/deep-critic.git
 cd deep-critic
 ```
 
