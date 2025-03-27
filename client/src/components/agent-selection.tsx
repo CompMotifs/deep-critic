@@ -76,7 +76,6 @@ const AgentSelection = ({ selectedAgents, onToggleAgent }: AgentSelectionProps) 
               </span>
               <span className="text-sm">
                 <span className="font-medium text-gray-900 block">{agent.name}</span>
-                <span className="text-gray-500">{agent.description}</span>
               </span>
             </label>
           </div>

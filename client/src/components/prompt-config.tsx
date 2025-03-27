@@ -1,4 +1,5 @@
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 interface PromptConfigProps {
   prompt: string;
@@ -20,6 +21,10 @@ const PromptConfig = ({
     }
   };
   
+  const paperReviewTemplate = "Please review this academic paper for methodological rigor, clarity of arguments, and contribution to the field. Identify strengths, weaknesses, and suggest improvements.";
+  
+  const ideaCritiqueTemplate = "Please analyze this idea for innovation, feasibility, market potential, and possible implementation challenges. Provide constructive feedback and suggestions for improvement.";
+  
   return (
     <div className="mb-8">
       <h3 className="text-md font-medium text-gray-700 mb-2">Step 2: Enter Review Criteria</h3>
@@ -30,11 +35,32 @@ const PromptConfig = ({
           onChange={handlePromptChange}
           rows={4}
           className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          placeholder="Example: Please review this document for logical consistency, factual accuracy, and strength of arguments. Identify key strengths and weaknesses."
+          placeholder="Provide some context for what you want DeepCritic to focus on"
         />
         <div className="absolute bottom-2 right-2 text-xs text-gray-500">
           {charCount}/{maxChars}
         </div>
+      </div>
+      
+      <div className="mt-2 flex flex-wrap gap-2">
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="sm"
+          onClick={() => onPromptChange(paperReviewTemplate)}
+          className="text-xs"
+        >
+          Paper review
+        </Button>
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="sm"
+          onClick={() => onPromptChange(ideaCritiqueTemplate)}
+          className="text-xs"
+        >
+          Critique idea
+        </Button>
       </div>
     </div>
   );
