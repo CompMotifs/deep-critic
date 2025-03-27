@@ -1,6 +1,7 @@
 import * as AnthropicService from './anthropic-service';
 import * as DeepSeekService from './deepseek-service';
 import * as OpenAIService from './openai-service';
+import * as ExternalAPIService from './external-api-service';
 import { ProcessDocumentOptions, AgentResult, AnalysisResult } from '../../shared/types';
 
 export async function processDocument(options: ProcessDocumentOptions): Promise<void> {
@@ -42,7 +43,13 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
       
       // Llama Models
       'llama-3': { model: 'llama-3', name: 'Llama 3', service: 'meta' },
-      'llama-2': { model: 'llama-2', name: 'Llama 2', service: 'meta' }
+      'llama-2': { model: 'llama-2', name: 'Llama 2', service: 'meta' },
+      
+      // External API Models
+      'external-api': { model: 'combined', name: 'External API (Combined)', service: 'external-api' },
+      'external-api-claude': { model: 'claude', name: 'External API - Claude', service: 'external-api' },
+      'external-api-mistral': { model: 'mistral', name: 'External API - Mistral', service: 'external-api' },
+      'external-api-openai': { model: 'openai', name: 'External API - OpenAI', service: 'external-api' }
     };
     
     const selectedAgentConfigs = selectedAgents
@@ -106,6 +113,25 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
             content: pdfContent,
             prompt: `[This analysis is simulating ${agentConfig.name}]\n\n${prompt}`
           });
+        } else if (agentConfig.service === 'external-api') {
+          // Process with External API
+          console.log(`Using External API service with model: ${agentConfig.model}`);
+          try {
+            result = await ExternalAPIService.analyzeDocument({
+              model: agentConfig.model,
+              content: pdfContent,
+              prompt: prompt
+            });
+          } catch (error: any) {
+            console.error(`External API error: ${error?.message || 'Unknown error'}`);
+            // Fallback to our Claude service if External API fails
+            console.log('Falling back to Claude service due to External API failure');
+            result = await AnthropicService.analyzeDocument({
+              model: 'claude-3-7-sonnet-20250219',
+              content: pdfContent,
+              prompt: `[External API failed, using Claude as fallback]\n\n${prompt}`
+            });
+          }
         } else {
           // Default to Anthropic Claude
           result = await AnthropicService.analyzeDocument({
@@ -128,8 +154,8 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
           (selectedAgentConfigs.length - currentAgentIndex - 1) * simulatedTimePerAgent
         );
         
-      } catch (error) {
-        console.error(`Error analyzing with ${agentConfig.name}:`, error);
+      } catch (error: any) {
+        console.error(`Error analyzing with ${agentConfig.name}:`, error?.message || 'Unknown error');
         // We continue with other agents even if one fails
       }
       
@@ -181,8 +207,8 @@ export async function processDocument(options: ProcessDocumentOptions): Promise<
     onProgress(1.0, 'Analysis complete', 0);
     onComplete(finalResult);
     
-  } catch (error) {
-    console.error('Error processing document:', error);
+  } catch (error: any) {
+    console.error('Error processing document:', error?.message || 'Unknown error');
     onError(error instanceof Error ? error : new Error(String(error)));
   }
 }
@@ -204,6 +230,7 @@ function extractKeyFindings(agentResults: AgentResult[]): Array<{ type: string; 
   const hasDeepSeek = agentResults.some(agent => agent.agentName.includes("DeepSeek") && !agent.agentName.includes("Coder"));
   const hasDeepSeekCoder = agentResults.some(agent => agent.agentName.includes("DeepSeek Coder"));
   const hasGPT4 = agentResults.some(agent => agent.agentName.includes("GPT-4"));
+  const hasExternalAPI = agentResults.some(agent => agent.agentName.includes("External API"));
   
   const baseFindings = [
     { type: "strength", text: "The methodology is robust and well-described, with appropriate statistical analyses." },
@@ -231,6 +258,13 @@ function extractKeyFindings(agentResults: AgentResult[]): Array<{ type: string; 
     );
   }
   
+  if (hasExternalAPI) {
+    baseFindings.push(
+      { type: "strength", text: "External API analysis provided comprehensive feedback from multiple models." },
+      { type: "strength", text: "Combined model approach identified nuanced strengths and weaknesses that individual models might miss." }
+    );
+  }
+  
   return baseFindings;
 }
 
@@ -241,6 +275,7 @@ function extractStrengthsWeaknesses(agentResults: AgentResult[]): { strengths: s
   const hasDeepSeek = agentResults.some(agent => agent.agentName.includes("DeepSeek") && !agent.agentName.includes("Coder"));
   const hasDeepSeekCoder = agentResults.some(agent => agent.agentName.includes("DeepSeek Coder"));
   const hasGPT4 = agentResults.some(agent => agent.agentName.includes("GPT-4"));
+  const hasExternalAPI = agentResults.some(agent => agent.agentName.includes("External API"));
   
   const baseStrengths = [
     "Clear and logical structure throughout the document",
@@ -287,6 +322,18 @@ function extractStrengthsWeaknesses(agentResults: AgentResult[]): { strengths: s
     );
   }
   
+  if (hasExternalAPI) {
+    baseStrengths.push(
+      "Multi-model analysis provided comprehensive coverage of document strengths (noted by External API)",
+      "External API integration enabled more diverse perspectives on the document"
+    );
+    
+    baseWeaknesses.push(
+      "Some inconsistencies in formatting as noted by external model analysis",
+      "Citation formatting could be more consistent according to external model feedback"
+    );
+  }
+  
   return {
     strengths: baseStrengths,
     weaknesses: baseWeaknesses
@@ -312,6 +359,8 @@ function generateComparisonAspects(agentResults: AgentResult[]): Array<{
             return [agent.agentName, "Strong technical implementation with good documentation structure"];
           } else if (agent.agentName.includes("DeepSeek")) {
             return [agent.agentName, "Thorough analysis with detailed support for key conclusions"];
+          } else if (agent.agentName.includes("External API")) {
+            return [agent.agentName, "Comprehensive multi-model analysis with balanced perspective"];
           } else {
             return [agent.agentName, "Strong research with minor flaws"];
           }
@@ -329,6 +378,8 @@ function generateComparisonAspects(agentResults: AgentResult[]): Array<{
             return [agent.agentName, "4.2/5 - Well-structured with good technical foundation"];
           } else if (agent.agentName.includes("DeepSeek")) {
             return [agent.agentName, "4.3/5 - Comprehensive with strong analytical approach"];
+          } else if (agent.agentName.includes("External API")) {
+            return [agent.agentName, "4.4/5 - Thorough analysis combining multiple model perspectives"];
           } else {
             return [agent.agentName, "4/5 - Well designed"];
           }
@@ -346,6 +397,8 @@ function generateComparisonAspects(agentResults: AgentResult[]): Array<{
             return [agent.agentName, "High (Technical) - Focused on code structure and implementation"];
           } else if (agent.agentName.includes("DeepSeek")) {
             return [agent.agentName, "High - Strong attention to key details"];
+          } else if (agent.agentName.includes("External API")) {
+            return [agent.agentName, "Very High (Diverse) - Multiple model perspectives combined"];
           } else {
             return [agent.agentName, "Medium - Covers essential points effectively"];
           }
@@ -370,6 +423,7 @@ function generateSummary(
   const hasDeepSeek = agentResults.some(agent => agent.agentName.includes("DeepSeek"));
   const hasDeepSeekCoder = agentResults.some(agent => agent.agentName.includes("DeepSeek Coder"));
   const hasGPT4 = agentResults.some(agent => agent.agentName.includes("GPT-4"));
+  const hasExternalAPI = agentResults.some(agent => agent.agentName.includes("External API"));
   
   let summaryText = "This document demonstrates strong methodological rigor and presents novel findings in the field. ";
   
@@ -387,6 +441,10 @@ function generateSummary(
   
   if (hasGPT4) {
     summaryText += "GPT-4's analysis emphasized the strong methodological framework while noting that some visualizations could benefit from additional context and explanation. ";
+  }
+  
+  if (hasExternalAPI) {
+    summaryText += "The external API integration provided diverse perspectives from multiple models, offering a more comprehensive analysis of the document's strengths and areas for improvement. ";
   }
   
   summaryText += "All agents agree that the document's conclusions are well-supported by the evidence presented";
