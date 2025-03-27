@@ -28,16 +28,16 @@ def aggregate_feedback(feedbacks: Review) -> dict:
     limitations_list = []
 
     for i, fb in enumerate(feedbacks):
-        soundness_scores.append(fb.soundness)
-        presentation_scores.append(fb.presentation)
-        contribution_scores.append(fb.contribution)
-        rating_scores.append(fb.rating)
+        soundness_scores.append(fb.get("soundness"))
+        presentation_scores.append(fb.get("presentation"))
+        contribution_scores.append(fb.get("contribution"))
+        rating_scores.append(fb.get("rating"))
 
-        summaries.append(f"LLM {i+1}: {fb.summary}")
-        strengths_list.append(f"LLM {i+1}: {fb.strengths}")
-        weaknesses_list.append(f"LLM {i+1}: {fb.weaknesses}")
-        questions_list.append(f"LLM {i+1}: {fb.questions}")
-        limitations_list.append(f"LLM {i+1}: {fb.limitations}")
+        summaries.append(f"LLM {i+1}: {fb.get('summary')}")
+        strengths_list.append(f"LLM {i+1}: {fb.get('strengths')}")
+        weaknesses_list.append(f"LLM {i+1}: {fb.get('weaknesses')}")
+        questions_list.append(f"LLM {i+1}: {fb.get('questions')}")
+        limitations_list.append(f"LLM {i+1}: {fb.get('limitations')}")
 
     # Compute averages
     aggregated = {}
