@@ -92,6 +92,15 @@ http://localhost:8000/api/upload-and-review
 - The frontend directory is currently just a placeholder. The UI implementation is planned for future development.
 - For production deployment, you should configure proper CORS settings in `app/config.py`.
 - Consider using environment-specific configuration for different deployment environments.
+- A concrete list of TODOs, roughly in priority order:
+  - Decide on local versus hosted deployment for front and backend and resolve related networking issues
+  - Add richer API options and parameter handling in order to capture input from users (MVP could just be use all the models in some fixed set?)
+  - Build and execute validation machinery (How to compare to NeurIPS reviews? How to easily batch analyses?)
+  - Add more models
+  - Add model-model communication
+  - Improve performance of PDF OCR
+- Before a real release, need to fix:
+  - Keys, User management, Database, CI/CD
 
 ## Troubleshooting
 
