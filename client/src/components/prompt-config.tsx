@@ -25,10 +25,6 @@ const PromptConfig = ({
   
   const ideaCritiqueTemplate = "Please analyze this idea for innovation, feasibility, market potential, and possible implementation challenges. Provide constructive feedback and suggestions for improvement.";
   
-  const businessProposalTemplate = "Please evaluate this business proposal for market viability, competitive advantage, financial projections, and overall strategy. Highlight strengths, identify risks, and provide recommendations.";
-  
-  const productDesignTemplate = "Please assess this product design for usability, aesthetics, technical feasibility, and market fit. Evaluate how well it addresses user needs and suggest potential improvements.";
-  
   return (
     <div className="mb-8">
       <h3 className="text-md font-medium text-gray-700 mb-2">Step 2: Enter Review Criteria</h3>
@@ -64,24 +60,6 @@ const PromptConfig = ({
           className="text-xs"
         >
           Critique idea
-        </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="sm"
-          onClick={() => onPromptChange(businessProposalTemplate)}
-          className="text-xs"
-        >
-          Business proposal
-        </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="sm"
-          onClick={() => onPromptChange(productDesignTemplate)}
-          className="text-xs"
-        >
-          Product design
         </Button>
       </div>
     </div>
