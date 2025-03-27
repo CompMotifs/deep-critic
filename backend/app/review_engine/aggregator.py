@@ -2,13 +2,29 @@ import numpy as np
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
-from app.review_engine.structure import Review
+from pydantic import BaseModel
 
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-def aggregate_feedback(feedbacks: Review) -> dict:
+
+class Review(BaseModel):
+    summary: str
+    soundness: float
+    presentation: float
+    contribution: float
+    strengths: str
+    weaknesses: str
+    questions: str
+    limitations: str
+    rating: float
+    confidence: float
+
+
+def aggregate_feedback(
+    feedbacks: Review,
+) -> dict:
     """
     Aggregate parsed feedback from multiple LLM responses.
     For numeric scores, computes the average.
@@ -120,3 +136,58 @@ def convert_to_openreview(aggregated_data: dict) -> str:
         f"Confidence: {aggregated_data.get('confidence')}\n"
     )
     return call_conversion_llm(context, prompt)
+
+
+def get_llm_agreement(context: str, prompt: str) -> str:
+    """
+    Call an LLM to get the agreement between two reviewers.
+    """
+    client = OpenAI()
+
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": context},
+            {"role": "user", "content": prompt},
+        ],
+    )
+
+    return completion.choices[0].message.content
+
+
+def get_agreement(reviewer1: dict, reviewer2: dict) -> str:
+    """
+    Get agreement between two reviewers.
+    """
+    context = (
+        "Using the following aggregated feedback from two reviewers with the sections"
+        "Summary; Soundness, Presentation and Contribution (scores from 1 to 5);"
+        "Strengths and Weaknesses; Questions; Limitations; Rating (score from 1 to 10); Confidence,"
+        "quantify the agreement between them as a percentage. Only return the agreement percentage without any additional text."
+    )
+    prompt = (
+        f"Reviewer 1:\n"
+        f"Summary: {reviewer1.get('summary')}\n"
+        f"Soundness: {reviewer1.get('soundness')}\n"
+        f"Presentation: {reviewer1.get('presentation')}\n"
+        f"Contribution: {reviewer1.get('contribution')}\n"
+        f"Strengths: {reviewer1.get('strengths')}\n"
+        f"Weaknesses: {reviewer1.get('weaknesses')}\n"
+        f"Questions: {reviewer1.get('questions')}\n"
+        f"Limitations: {reviewer1.get('limitations')}\n"
+        f"Rating: {reviewer1.get('rating')}\n"
+        f"Confidence: {reviewer1.get('confidence')}\n"
+        f"\n"
+        f"Reviewer 2:\n"
+        f"Summary: {reviewer2.get('summary')}\n"
+        f"Soundness: {reviewer2.get('soundness')}\n"
+        f"Presentation: {reviewer2.get('presentation')}\n"
+        f"Contribution: {reviewer2.get('contribution')}\n"
+        f"Strengths: {reviewer2.get('strengths')}\n"
+        f"Weaknesses: {reviewer2.get('weaknesses')}\n"
+        f"Questions: {reviewer2.get('questions')}\n"
+        f"Limitations: {reviewer2.get('limitations')}\n"
+        f"Rating: {reviewer2.get('rating')}\n"
+        f"Confidence: {reviewer2.get('confidence')}\n"
+    )
+    return get_llm_agreement(context, prompt)
