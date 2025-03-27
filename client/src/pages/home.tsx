@@ -5,6 +5,7 @@ import AgentSelection from "@/components/agent-selection";
 import LoadingState from "@/components/loading-state";
 import ResultsDashboard from "@/components/results-dashboard";
 import Logo from "@/components/logo";
+import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { useReviewForm } from "@/hooks/use-review-form";
 import { useMutation } from "@tanstack/react-query";
@@ -109,8 +110,8 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="bg-gray-50 min-h-screen flex flex-col">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
         <header className="mb-10">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
@@ -191,6 +192,8 @@ const Home = () => {
           />
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 };
