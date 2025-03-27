@@ -163,7 +163,7 @@ def get_agreement(reviewer1: dict, reviewer2: dict) -> str:
         "Using the following aggregated feedback from two reviewers with the sections"
         "Summary; Soundness, Presentation and Contribution (scores from 1 to 5);"
         "Strengths and Weaknesses; Questions; Limitations; Rating (score from 1 to 10); Confidence,"
-        "quantify the agreement between them as a percentage. Only return the agreement percentage without any additional text."
+        "quantify the agreement between them as a decimal between 0 and 1. Only return the decimal, without any additional text."
     )
     prompt = (
         f"Reviewer 1:\n"
