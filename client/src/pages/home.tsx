@@ -125,6 +125,10 @@ const Home = () => {
               </svg>
               <h1 className="text-3xl font-bold text-gray-800">DeepCritic</h1>
             </div>
+            <div className="flex flex-col items-end">
+              <img src="/client/public/logo.png" alt="Logo" className="h-12" />
+              <span className="text-xs text-gray-500 mt-1">A compmotifs.com initiative</span>
+            </div>
           </div>
           <p className="mt-2 text-gray-600 max-w-3xl">
             Get comprehensive document reviews from multiple AI models. Upload your PDF, customize your review criteria, and receive detailed insights.
@@ -133,24 +137,32 @@ const Home = () => {
 
         {step === "config" && (
           <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6">
+            {/* Steps in a horizontal grid layout */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="md:col-span-1">
+                <FileUpload
+                  file={file}
+                  onFileChange={setFile}
+                />
+              </div>
+              
+              <div className="md:col-span-1">
+                <PromptConfig
+                  prompt={prompt}
+                  onPromptChange={setPrompt}
+                  charCount={charCount}
+                />
+              </div>
+              
+              <div className="md:col-span-1">
+                <AgentSelection
+                  selectedAgents={selectedAgents}
+                  onToggleAgent={toggleAgent}
+                />
+              </div>
+            </div>
             
-            <FileUpload
-              file={file}
-              onFileChange={setFile}
-            />
-            
-            <PromptConfig
-              prompt={prompt}
-              onPromptChange={setPrompt}
-              charCount={charCount}
-            />
-            
-            <AgentSelection
-              selectedAgents={selectedAgents}
-              onToggleAgent={toggleAgent}
-            />
-            
-            <div className="flex justify-end mt-6">
+            <div className="flex justify-end">
               <Button
                 type="submit"
                 size="lg"

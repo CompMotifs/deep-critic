@@ -26,7 +26,7 @@ const PromptConfig = ({
   const ideaCritiqueTemplate = "Please analyze this idea for innovation, feasibility, market potential, and possible implementation challenges. Provide constructive feedback and suggestions for improvement.";
   
   return (
-    <div className="mb-8">
+    <div className="h-full">
       <h3 className="text-md font-medium text-gray-700 mb-2">Step 2: Enter Review Criteria</h3>
       <div className="relative">
         <Textarea
