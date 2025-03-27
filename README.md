@@ -1,17 +1,19 @@
 # Deep Critic: Academic Paper Review System
 
-Deep Critic is an API that leverages multiple Large Language Models (LLMs) to provide comprehensive reviews of academic papers. It uses OpenAI, Anthropic, and Mistral models to analyze papers and generate structured feedback similar to conference review processes.
+Deep Critic is an integrated web application designed to provide comprehensive reviews of academic papers using multiple Large Language Models (LLMs). It combines models from OpenAI, Anthropic, and Mistral to generate structured, consensus-driven feedback resembling peer-review processes at conferences such as NeurIPS.
 
 ## Features
 
-- Multiple LLM integration (OpenAI, Claude, Mistral)
-- PDF extraction and processing
-- NeurIPS-style paper reviews
-- Consensus review generation combining insights from all models
+- Integration with multiple LLMs (OpenAI, Claude, Mistral)
+- PDF upload, extraction, and processing
+- Automatic generation of structured paper reviews
+- Consensus reviews combining insights from multiple models
+- User-friendly React frontend interface
 
 ## Prerequisites
 
 - Docker and Docker Compose
+- Node.js and npm (for frontend development)
 - API keys for OpenAI, Anthropic, and Mistral
 
 ## Getting Started
@@ -23,90 +25,113 @@ git clone https://github.com/CompMotifs/deep-critic.git
 cd deep-critic
 ```
 
-### 2. Set Up Environment Variables
+### 2. Configure Environment Variables
 
-Create a `.env` file in the root directory by copying the template:
+Create a `.env` file from the provided template and add your API keys:
 
 ```bash
 cp .env_template .env
 ```
 
-Then edit the `.env` file to add your API keys:
+Edit `.env` and populate your API keys:
 
-```
+```bash
 OPENAI_API_KEY=your-openai-key
 ANTHROPIC_API_KEY=your-claude-key
 MISTRAL_API_KEY=your-mistral-key
 ```
 
-### 3. Build and Start the Backend Service
+### 3. Build and Run the Application
 
-Build the Docker container:
-
-```bash
-docker compose build backend
-```
-
-Start the backend service:
+Build both frontend and backend services:
 
 ```bash
-docker compose up backend
+docker compose build
 ```
 
-The API should now be running at `http://localhost:8000`.
-
-## Testing the API
-
-### Simple Text Review
-
-You can test the API by sending a POST request with paper text:
+Start all services:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" \
--d '{"paper_text": "This paper presents a novel approach to natural language processing using transformer architectures. We demonstrate state-of-the-art results on several benchmarks including GLUE and SuperGLUE."}' \
-http://localhost:8000/api/review
+docker compose up
 ```
 
-### PDF Upload and Review
+Once running, the frontend is accessible at [http://localhost:80](http://localhost:80), and the backend API is accessible at [http://localhost:8000](http://localhost:8000).
 
-To test with a PDF file:
+## Development Workflow
+
+### Frontend Development
+
+For frontend development with hot reloading, follow these steps:
 
 ```bash
-curl -X POST \
--F "pdf_file=@/path/to/your/paper.pdf" \
-http://localhost:8000/api/upload-and-review
+cd frontend
+npm install
+npm start
 ```
 
+The React application will run locally at [http://localhost:3000](http://localhost:3000) and automatically reload on source code changes.
+
+### Backend Development
+
+The backend is built using FastAPI. For local development with automatic reloading:
+
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+This will run the API locally at [http://localhost:8000](http://localhost:8000).
 
 ## Project Structure
 
-- `backend/`: FastAPI backend application
-  - `api/`: API routes and endpoints
-  - `app/`: Core application logic
-    - `review_engine/`: Paper review logic
-    - `services/`: External services integration (LLMs, PDF processing)
-- `frontend/`: Frontend placeholder (not implemented yet)
+```
+deep-critic/
+├── backend/
+│   ├── api/               # API routes and endpoints
+│   ├── app/
+│   │   ├── review_engine/ # Paper review logic
+│   │   └── services/      # Integration with external services (LLMs, PDF processing)
+│   └── requirements.txt   # Python dependencies
+│
+├── frontend/
+│   ├── public/            # Static files
+│   │   └── index.html
+│   ├── src/               # React components
+│   │   ├── App.js
+│   │   ├── DeepCriticApp.js
+│   │   ├── DeepCriticApp.css
+│   │   └── index.js
+│   ├── package.json
+│   ├── Dockerfile
+│   └── Dockerfile.dev
+│
+├── docker-compose.yml
+├── .env_template
+└── README.md
+```
 
-## Notes
+## Current Development Goals
 
-- The frontend directory is currently just a placeholder. The UI implementation is planned for future development.
-- For production deployment, you should configure proper CORS settings in `app/config.py`.
-- Consider using environment-specific configuration for different deployment environments.
-- A concrete list of TODOs, roughly in priority order:
-  - Decide on local versus hosted deployment for front and backend and resolve related networking issues
-  - Add richer API options and parameter handling in order to capture input from users (MVP could just be use all the models in some fixed set?)
-  - Build and execute validation machinery (How to compare to NeurIPS reviews? How to easily batch analyses?)
-  - Add more models
-  - Add model-model communication
-  - Improve performance of PDF OCR
-- Before a real release, need to fix:
-  - Keys, User management, Database, CI/CD
+- Improve and extend API functionality
+- Enhance frontend user experience
+- Add automated validation and batch review analysis
+- Improve PDF processing performance
+- Incorporate additional language models and inter-model communication
+- Set up robust user management, authentication, database integration, and CI/CD
 
 ## Troubleshooting
 
 If you encounter issues:
 
-1. Verify your API keys are correctly set in the `.env` file
-2. Check Docker logs: `docker compose logs backend`
-3. Ensure all required ports are available
-4. For PDF processing issues, verify the PDF is not corrupted and is readable
+1. Confirm that all API keys are correctly set in your `.env` file.
+2. Check logs from Docker Compose:
+
+```bash
+docker compose logs backend
+docker compose logs frontend
+```
+
+3. Verify port availability (default frontend: `80`, backend: `8000`).
+4. Ensure uploaded PDFs are readable and not corrupted.
+
