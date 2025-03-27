@@ -8,7 +8,7 @@ load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-def aggregate_feedback(parsed_feedbacks: list) -> dict:
+def aggregate_feedback(feedbacks: Review) -> dict:
     """
     Aggregate parsed feedback from multiple LLM responses.
     For numeric scores, computes the average.
@@ -27,26 +27,17 @@ def aggregate_feedback(parsed_feedbacks: list) -> dict:
     questions_list = []
     limitations_list = []
 
-    for fb in parsed_feedbacks:
-        if fb.get("soundness") is not None:
-            soundness_scores.append(fb["soundness"])
-        if fb.get("presentation") is not None:
-            presentation_scores.append(fb["presentation"])
-        if fb.get("contribution") is not None:
-            contribution_scores.append(fb["contribution"])
-        if fb.get("rating") is not None:
-            rating_scores.append(fb["rating"])
+    for i, fb in enumerate(feedbacks):
+        soundness_scores.append(fb.soundness)
+        presentation_scores.append(fb.presentation)
+        contribution_scores.append(fb.contribution)
+        rating_scores.append(fb.rating)
 
-        if fb.get("summary"):
-            summaries.append(fb["summary"])
-        if fb.get("strengths"):
-            strengths_list.append(fb["strengths"])
-        if fb.get("weaknesses"):
-            weaknesses_list.append(fb["weaknesses"])
-        if fb.get("questions"):
-            questions_list.append(fb["questions"])
-        if fb.get("limitations"):
-            limitations_list.append(fb["limitations"])
+        summaries.append(f"LLM {i+1}: {fb.summary}")
+        strengths_list.append(f"LLM {i+1}: {fb.strengths}")
+        weaknesses_list.append(f"LLM {i+1}: {fb.weaknesses}")
+        questions_list.append(f"LLM {i+1}: {fb.questions}")
+        limitations_list.append(f"LLM {i+1}: {fb.limitations}")
 
     # Compute averages
     aggregated = {}
