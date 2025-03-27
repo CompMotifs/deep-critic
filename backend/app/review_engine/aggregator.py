@@ -1,7 +1,11 @@
 import numpy as np
-from outputparser.parser import parse_llm_feedback
-from outputparser.converter import convert_to_openreview
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
 
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 def aggregate_feedback(parsed_feedbacks: list) -> dict:
     """
@@ -80,16 +84,6 @@ def aggregate_feedback(parsed_feedbacks: list) -> dict:
     return aggregated
 
 
-def process_llm_feedbacks(raw_feedbacks: list) -> str:
-    """
-    Process raw feedback texts from multiple LLMs and produce the final OpenReview style review.
-    """
-    parsed_feedbacks = [parse_llm_feedback(text) for text in raw_feedbacks]
-    aggregated_data = aggregate_feedback(parsed_feedbacks)
-    final_review = convert_to_openreview(aggregated_data)
-    return final_review
-
-
 def call_conversion_llm(prompt: str) -> str:
     """
     Call an LLM to convert the aggregated feedback into an OpenReview style review.
@@ -97,7 +91,7 @@ def call_conversion_llm(prompt: str) -> str:
     client = OpenAI(api_key=OPENAI_API_KEY)
 
     completion = client.chat.completions.create(
-        model="gpt-4o",  # You might want to make this configurable
+        model="gpt-4o-mini",  # You might want to make this configurable
         messages=[{"role": "user", "content": prompt}]
     )
     return completion.choices[0].message.content
@@ -126,5 +120,39 @@ def convert_to_openreview(aggregated_data: dict) -> str:
         f"Rating: {aggregated_data.get('rating')}\n"
         f"Confidence: {aggregated_data.get('confidence')}\n"
     )
-    return call_conversion_llm(prompt)
+    
+    # Instead of calling OpenAI, just format the review as a string
+    # This is a simplified version that prevents the need for an additional API call
+    return format_review(aggregated_data)
 
+
+def format_review(aggregated_data: dict) -> str:
+    """
+    Format the aggregated data into a structured review without calling an external API.
+    """
+    return f"""# Review Summary
+
+{aggregated_data.get('summary', 'No summary provided.')}
+
+## Soundness: {aggregated_data.get('soundness', 'N/A')}/5
+
+## Presentation: {aggregated_data.get('presentation', 'N/A')}/5
+
+## Contribution: {aggregated_data.get('contribution', 'N/A')}/5
+
+## Strengths
+{aggregated_data.get('strengths', 'No strengths provided.')}
+
+## Weaknesses
+{aggregated_data.get('weaknesses', 'No weaknesses provided.')}
+
+## Questions
+{aggregated_data.get('questions', 'No questions provided.')}
+
+## Limitations
+{aggregated_data.get('limitations', 'No limitations noted.')}
+
+## Rating: {aggregated_data.get('rating', 'N/A')}/10
+
+## Confidence: {aggregated_data.get('confidence', 'N/A')}/10
+"""

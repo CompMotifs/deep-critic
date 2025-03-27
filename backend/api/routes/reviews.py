@@ -1,11 +1,7 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Body
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.review_engine.orchestrator import ReviewEngine
+from app.review_engine.prompt import REVIEW_PROMPT
 from pydantic import BaseModel
-
-# Import the review prompt
-import sys
-sys.path.append('.')  # Add root directory to path
-from review_prompt import REVIEW_PROMPT
 
 router = APIRouter()
 

@@ -1,12 +1,11 @@
 import os
-from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage
+from mistralai import Mistral
 from dotenv import load_dotenv
 
 load_dotenv()
 
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
-client = MistralClient(api_key=MISTRAL_API_KEY)
+client = Mistral(api_key=MISTRAL_API_KEY)
 
 def get_mistral_review(paper_text, prompt):
     """
@@ -19,11 +18,15 @@ def get_mistral_review(paper_text, prompt):
     Returns:
         The raw response from the Mistral API
     """
+    # Correct format: messages should be a list of message objects
     messages = [
-        ChatMessage(role="user", content=f"{prompt}\n\nPaper:\n{paper_text}")
+        {
+            'role': 'user',
+            'content': f"{prompt}\n\nPaper:\n{paper_text}"
+        }
     ]
     
-    chat_response = client.chat(
+    chat_response = client.chat.complete(
         model="mistral-small-latest",
         messages=messages
     )
