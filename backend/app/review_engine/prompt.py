@@ -46,7 +46,7 @@ class PROMPT(BaseModel):
     )
 
     q2_soundness_statement: str = (
-        "Soundness: Evaluate the theoretical or methodological soundness of the submission. Score between 1 and 5 as stated below. Give 1 or 5 in very exceptionally bad or amazing cases\n"
+        "Soundness: Evaluate the theoretical or methodological soundness of the submission. Score between 1 and 5 as stated below.\n"
         "1:poor\n"
         "2:fair\n"
         "3:good\n"
@@ -56,7 +56,7 @@ class PROMPT(BaseModel):
     )
 
     q3_presentation_statement: str = (
-        "Presentation: Evaluate the quality of the presnetation in the paper. Score between 1 and 5 as stated below. Give 1 or 5 in very exceptionally bad or amazing cases\n"
+        "Presentation: Evaluate the quality of the presnetation in the paper. Score between 1 and 5 as stated below.\n"
         "1:poor\n"
         "2:fair\n"
         "3:good\n"
@@ -66,7 +66,7 @@ class PROMPT(BaseModel):
     )
 
     q4_contribution_statement: str = (
-        "Contribution: Evaluate the contribution this paper makes to the community and the scientific field. Score between 1 and 5 as stated below. Give 1 or 5 in very exceptionally bad or amazing cases\n"
+        "Contribution: Evaluate the contribution this paper makes to the community and the scientific field. Score between 1 and 5 as stated below.\n"
         "1:poor\n"
         "2:fair\n"
         "3:good\n"
