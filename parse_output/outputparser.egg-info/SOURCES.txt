@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+setup.py
+outputparser.egg-info/PKG-INFO
+outputparser.egg-info/SOURCES.txt
+outputparser.egg-info/dependency_links.txt
+outputparser.egg-info/requires.txt
+outputparser.egg-info/top_level.txt
+src/__init__.py
+src/converter.py
+src/parser.py
+src/review_processor.py
+tests/__init__.py
+tests/test_converter.py
+tests/test_parser.py
+tests/test_review_processor.py
