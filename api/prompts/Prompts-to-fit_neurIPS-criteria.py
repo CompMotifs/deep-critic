@@ -4,6 +4,7 @@
 # # Prompts and guidelines for writing a NeurIPS review
 # 
 # What a NeurIPS prompt looks like: https://openreview.net/forum?id=aVh9KRZdRk
+# Original prompts come from: https://neurips.cc/Conferences/2020/PaperInformation/ReviewerGuidelines
 
 # In[ ]:
 
