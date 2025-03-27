@@ -10,6 +10,8 @@ Install the required dependencies by running:
 pip install -r requirements.txt
 ```
 
+Ensure you have configured your .env file properly! See .env_template in the repo, copy it to .env, and fill it out. 
+
 ## Starting the Server
 
 Start the FastAPI backend server using:
