@@ -5,3 +5,5 @@ anthropic
 requests
 mistralai
 python-dotenv
+marker-pdf
+python-multipart
