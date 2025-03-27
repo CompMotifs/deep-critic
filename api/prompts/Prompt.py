@@ -1,7 +1,4 @@
 class Prompt:
-      #!/usr/bin/env python
-      # coding: utf-8
-
       # # Prompts and guidelines for writing a NeurIPS review
       # 
       # What a NeurIPS prompt looks like: https://openreview.net/forum?id=aVh9KRZdRk
