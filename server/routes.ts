@@ -5,6 +5,7 @@ import multer from "multer";
 import { z } from "zod";
 import { processDocument } from "./services/pdf-service";
 import crypto from "crypto";
+import { setupWebSocketServer, sendJobUpdate } from "./websocket";
 
 // Setup multer for file uploads
 const upload = multer({
@@ -20,18 +21,25 @@ const upload = multer({
   }
 });
 
-// Map to store active job connections
-const activeJobs = new Map<string, { 
+// Define job status type 
+type JobStatus = {
   progress: number,
   stage: string,
   estimatedTimeRemaining: number,
   status: 'pending' | 'processing' | 'completed' | 'failed',
   error?: string,
-  result?: any // Store the result when completed
-}>();
+  result?: any, // Store the result when completed
+  agentStatuses?: Record<string, 'waiting' | 'processing' | 'completed' | 'failed'>
+};
+
+// Map to store active job connections
+const activeJobs = new Map<string, JobStatus>();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
+  
+  // Initialize WebSocket server
+  const wss = setupWebSocketServer(httpServer);
   
   // API routes
   app.post('/api/review', upload.single('file'), async (req: Request, res: Response) => {
@@ -83,36 +91,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         prompt,
         selectedAgents: agents,
         onProgress: (progress, stage, timeRemaining) => {
-          activeJobs.set(jobId, {
+          // Update job status in memory
+          const jobStatus: JobStatus = {
             progress,
             stage,
             estimatedTimeRemaining: timeRemaining,
             status: 'processing'
-          });
+          };
+          activeJobs.set(jobId, jobStatus);
+          
+          // Send WebSocket update to clients
+          sendJobUpdate(jobId, jobStatus);
         },
         onComplete: async (result) => {
-          activeJobs.set(jobId, {
+          // Update job status in memory
+          const jobStatus: JobStatus = {
             progress: 1,
             stage: 'Complete',
             estimatedTimeRemaining: 0,
-            status: 'completed'
-          });
+            status: 'completed',
+            result // Store the result
+          };
+          activeJobs.set(jobId, jobStatus);
           
-          // Store the result in database (for future reference)
+          // Store the result in database
           try {
             // We would normally save to the database here, but for simplicity
             // in the demo we'll just keep it in memory
+            
+            // Send WebSocket completion notification
+            sendJobUpdate(jobId, {
+              ...jobStatus,
+              message: 'Analysis complete'
+            });
           } catch (error) {
             console.error('Failed to save job result:', error);
           }
         },
         onError: (error) => {
-          activeJobs.set(jobId, {
+          // Update job status in memory
+          const jobStatus: JobStatus = {
             progress: 0,
             stage: 'Failed',
             estimatedTimeRemaining: 0,
             status: 'failed',
             error: error.message
+          };
+          activeJobs.set(jobId, jobStatus);
+          
+          // Send WebSocket error notification
+          sendJobUpdate(jobId, {
+            ...jobStatus,
+            message: 'Analysis failed'
           });
         }
       });

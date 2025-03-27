@@ -14,6 +14,7 @@ const Home = () => {
   const { toast } = useToast();
   const [step, setStep] = useState<"config" | "loading" | "results">("config");
   const [result, setResult] = useState<any>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
   
   const {
     file,
@@ -52,8 +53,17 @@ const Home = () => {
       setStep("loading");
     },
     onSuccess: (data) => {
-      setResult(data);
-      setStep("results");
+      if (data?.jobId) {
+        setJobId(data.jobId);
+        setStep("loading");
+      } else {
+        toast({
+          title: "Error",
+          description: "Invalid response from server",
+          variant: "destructive",
+        });
+        setStep("config");
+      }
     },
     onError: (error) => {
       toast({
@@ -127,8 +137,15 @@ const Home = () => {
           </form>
         )}
 
-        {step === "loading" && (
-          <LoadingState progress={reviewMutation.isPending ? 0.45 : 1} />
+        {step === "loading" && jobId && (
+          <LoadingState 
+            jobId={jobId}
+            selectedAgents={selectedAgents}
+            onAnalysisComplete={(analysisResult) => {
+              setResult(analysisResult);
+              setStep("results");
+            }}
+          />
         )}
 
         {step === "results" && result && (
@@ -136,6 +153,7 @@ const Home = () => {
             result={result}
             onBack={() => {
               setStep("config");
+              setJobId(null);
               resetForm();
             }}
           />

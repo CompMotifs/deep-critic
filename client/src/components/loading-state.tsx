@@ -1,39 +1,90 @@
 import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
+import { useJobWebSocket } from "@/hooks/use-job-websocket";
 
 interface LoadingStateProps {
-  progress: number;
+  jobId: string;
+  selectedAgents: string[];
+  onAnalysisComplete?: (result: any) => void;
 }
 
 type Agent = {
   id: string;
   name: string;
-  status: "waiting" | "processing" | "completed";
+  status: "waiting" | "processing" | "completed" | "failed";
   color: string;
   letter: string;
 };
 
-const LoadingState = ({ progress = 0 }: LoadingStateProps) => {
-  const [currentStage, setCurrentStage] = useState("Analyzing with Claude 3.7 Sonnet");
+// Agent configuration mapping
+const agentConfig: Record<string, { name: string, color: string, letter: string }> = {
+  "claude-3.7-sonnet": {
+    name: "Claude 3.7 Sonnet",
+    color: "text-[#8B5CF6]",
+    letter: "C"
+  },
+  "claude-3-opus": {
+    name: "Claude 3 Opus",
+    color: "text-[#EC4899]",
+    letter: "O"
+  },
+  "gpt-4o": {
+    name: "GPT-4o",
+    color: "text-[#10B981]",
+    letter: "G"
+  },
+  "deepseek": {
+    name: "DeepSeek",
+    color: "text-[#3B82F6]",
+    letter: "D"
+  }
+};
+
+const LoadingState = ({ jobId, selectedAgents, onAnalysisComplete }: LoadingStateProps) => {
+  const [progress, setProgress] = useState(0);
+  const [currentStage, setCurrentStage] = useState("Initializing analysis");
   const [timeRemaining, setTimeRemaining] = useState(120);
-  const [agents, setAgents] = useState<Agent[]>([
-    {
-      id: "claude",
-      name: "Claude 3.7 Sonnet",
-      status: "processing",
-      color: "text-[#8B5CF6]",
-      letter: "C"
-    },
-    {
-      id: "opus",
-      name: "Claude 3 Opus",
+  const [agents, setAgents] = useState<Agent[]>(() => 
+    selectedAgents.map(id => ({
+      id,
+      name: agentConfig[id]?.name || id,
       status: "waiting",
-      color: "text-[#EC4899]",
-      letter: "O"
-    }
-  ]);
+      color: agentConfig[id]?.color || "text-gray-500",
+      letter: agentConfig[id]?.letter || id.charAt(0).toUpperCase()
+    }))
+  );
   
-  // Simulate progress updates
+  // Use WebSocket for real-time updates
+  const { connected, jobStatus, error } = useJobWebSocket(jobId);
+  
+  // Update UI based on WebSocket updates
+  useEffect(() => {
+    if (jobStatus) {
+      setProgress(jobStatus.progress);
+      setCurrentStage(jobStatus.stage);
+      
+      if (jobStatus.estimatedTimeRemaining !== undefined) {
+        setTimeRemaining(jobStatus.estimatedTimeRemaining);
+      }
+      
+      // If we have per-agent status, update that too (assuming it's in the jobStatus data)
+      if (jobStatus.agentStatuses) {
+        setAgents(prevAgents => 
+          prevAgents.map(agent => ({
+            ...agent,
+            status: jobStatus.agentStatuses?.[agent.id] || agent.status
+          }))
+        );
+      }
+      
+      // If analysis is complete, call the completion handler
+      if (jobStatus.status === 'completed' && jobStatus.result && onAnalysisComplete) {
+        onAnalysisComplete(jobStatus.result);
+      }
+    }
+  }, [jobStatus, onAnalysisComplete]);
+  
+  // Update time remaining countdown
   useEffect(() => {
     if (progress >= 1) return;
     
