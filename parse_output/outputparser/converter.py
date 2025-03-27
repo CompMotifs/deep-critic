@@ -1,16 +1,22 @@
 from openai import OpenAI
+from outputparser.structure import Review
 
 
-def call_conversion_llm(prompt: str) -> str:
+def call_conversion_llm(context: str, prompt: str) -> str:
     """
     Call an LLM to convert the aggregated feedback into an OpenReview style review.
     """
     client = OpenAI()
 
-    completion = client.chat.completions.create(
-        model="gpt-4o", messages=[{"role": "user", "content": prompt}]
+    completion = client.beta.chat.completions.parse(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": context},
+            {"role": "user", "content": prompt},
+        ],
+        response_format=Review,
     )
-    return completion.choices[0].message.content
+    return completion.choices[0].message.parsed
 
 
 def convert_to_openreview(aggregated_data: dict) -> str:
@@ -21,10 +27,12 @@ def convert_to_openreview(aggregated_data: dict) -> str:
       strengths, weaknesses, questions, limitations, rating, confidence
     """
     # Create a prompt that includes all the aggregated details.
-    prompt = (
+    context = (
         "Using the following aggregated feedback, produce a final OpenReview style review "
         "with the sections: Summary; Soundness, Presentation and Contribution (scores from 1 to 5); "
-        "Strengths and Weaknesses; Questions; Limitations; Rating (score from 1 to 10); Confidence.\n\n"
+        "Strengths and Weaknesses; Questions; Limitations; Rating (score from 1 to 10); Confidence."
+    )
+    prompt = (
         f"Summary: {aggregated_data.get('summary')}\n"
         f"Soundness: {aggregated_data.get('soundness')}\n"
         f"Presentation: {aggregated_data.get('presentation')}\n"
@@ -36,4 +44,4 @@ def convert_to_openreview(aggregated_data: dict) -> str:
         f"Rating: {aggregated_data.get('rating')}\n"
         f"Confidence: {aggregated_data.get('confidence')}\n"
     )
-    return call_conversion_llm(prompt)
+    return call_conversion_llm(context, prompt)

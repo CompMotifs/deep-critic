@@ -1,5 +1,6 @@
 import unittest
 from outputparser.converter import convert_to_openreview
+from outputparser.structure import Review
 
 
 class TestConverter(unittest.TestCase):
@@ -17,15 +18,7 @@ class TestConverter(unittest.TestCase):
             "confidence": 9.0,
         }
         result = convert_to_openreview(aggregated_data)
-        self.assertIn("Summary", result)
-        self.assertIn("Soundness", result)
-        self.assertIn("Presentation", result)
-        self.assertIn("Contribution", result)
-        self.assertIn("Strengths", result)
-        self.assertIn("Weaknesses", result)
-        self.assertIn("Questions", result)
-        self.assertIn("Limitations", result)
-        self.assertIn("Rating", result)
+        self.assertIsInstance(result, Review)
 
 
 if __name__ == "__main__":
