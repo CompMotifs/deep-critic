@@ -241,6 +241,7 @@ class ReviewEngine:
             Raw response from the LLM service
         """
         try:
+            print("update_review_prompt", self.update_review_prompt)
             if service_name == "openai":
                 return get_updated_openai_review(
                     paper_text, self.update_review_prompt, review1, review2

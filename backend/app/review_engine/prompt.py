@@ -6,6 +6,7 @@ class PROMPT(BaseModel):
     Prompt for writing a NeurIPS-style review.
 
     Reviewer guidelines: https://neurips.cc/Conferences/2020/PaperInformation/ReviewerGuidelines
+    
     """
 
     # DONE: added additional context below;
@@ -14,6 +15,7 @@ class PROMPT(BaseModel):
         "Follow the NeurIPS reviewing guidelines closely. "
         "Provide a clear, constructive review for the paper. "
         "Do not reveal or guess author identities."
+        "BE EXTREMELY CRITICAL (LOW) IN YOUR NUMERICAL SCORES. Even among top conference papers, the highest score should be rare."
     )
 
     reviewer_best_practices: str = (
@@ -31,6 +33,7 @@ class PROMPT(BaseModel):
         "Engage actively in the discussion phase for each of the submissions that you are assigned, even if you are not specifically prompted to do so by the AC. "
         "Help the authors understand your viewpoint, without being dismissive or using inappropriate language. If you need to cite existing work to justify one of your comments, be as precise as possible and give a complete citation."
         "If you would like the authors to clarify something during the author response phase, articulate this clearly in your review (e.g., 'I would like to see results of experiment X' or 'Can you please include details about the parameter settings used for experiment Y')."
+        "BE EXTREMELY CRITICAL IN YOUR NUMERICAL SCORES. "
     )
     # Reviewer Instructions
     reviewer_doubleblind: str = (
@@ -185,6 +188,7 @@ class PROMPT(BaseModel):
             "}\n"
             "```\n\n"
             "Follow these guidelines for your review:\n"
+            "BE EXTREMELY CRITICAL (LOW) IN YOUR NUMERICAL SCORES. Even among top conference papers, the highest score should be rare.\n"
             "- summary: Provide a concise yet comprehensive summary of the paper's content\n"
             "- soundness: Score from 1-5 (5 is best) based on the paper's technical correctness and methodology\n"
             "- presentation: Score from 1-5 (5 is best) for writing clarity, organization, and readability\n"
@@ -198,20 +202,24 @@ class PROMPT(BaseModel):
             "Format your response as valid JSON without any additional text or explanation."
         )
 
+PROMPT = PROMPT()
 
 class UPDATE_REVIEW_PROMPT(BaseModel):
-    "Prompt for updating a review"
+    """Prompt for updating a review."""
 
     context: str = (
         "You are updating your review for a research paper. "
-        "You have already provided an initial review and are now revising it based on new information from other reviewers."
-        "Be professional, polite, and listen to the other reviewers, but do not give in to undue influence."
+        "You have already provided an initial review and are now revising it based on new information from other reviewers. "
+        "Be professional, polite, and listen to the other reviewers, but do not give in to undue influence. "
+        "Clearly indicate how your review has changed and justify any modifications. "
+        "This was the original prompt used for your initial review:\n\n"
+        f"{PROMPT}\n\n"
+        "Please provide your updated review structured strictly according to the same JSON schema as your initial response."
     )
 
     def __str__(self) -> str:
         return self.context
 
-
 # Create the prompt instance - the router code initializes the ReviewEngine with PROMPT
-PROMPT = PROMPT()
+
 UPDATE_REVIEW_PROMPT = UPDATE_REVIEW_PROMPT()
