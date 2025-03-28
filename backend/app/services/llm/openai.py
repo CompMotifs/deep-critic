@@ -22,7 +22,7 @@ def get_updated_openai_review(paper_text, prompt, review1, review2):
     messages = [
         {
             "role": "system",
-            "content": prompt,
+            "content": str(prompt),
         },
         {
             "role": "user",
@@ -31,7 +31,7 @@ def get_updated_openai_review(paper_text, prompt, review1, review2):
     ]
     #print("messages", messages)
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=messages,
         temperature=0.3,
     )

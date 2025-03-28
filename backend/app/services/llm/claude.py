@@ -17,7 +17,7 @@ Do not include any introductory text or explanations."""
 
 def get_claude_review(paper_text, prompt):
     message = anthropic_client.messages.create(
-        model="claude-3-haiku-20240307",
+        model="claude-3-5-haiku-latest",
         max_tokens=1000,
         temperature=0.3,
         messages=[{"role": "user", "content": f"{prompt}\n\nPaper:\n{paper_text}"}],
