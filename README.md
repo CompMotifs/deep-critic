@@ -41,7 +41,7 @@ ANTHROPIC_API_KEY=your-claude-key
 MISTRAL_API_KEY=your-mistral-key
 ```
 
-### 3. Build and Run the Application
+### 3. Build and Run the Application (Development Workflow)
 
 Build both frontend and backend services:
 
@@ -55,33 +55,8 @@ Start all services:
 docker compose up
 ```
 
-Once running, the frontend is accessible at [http://localhost:80](http://localhost:80), and the backend API is accessible at [http://localhost:8000](http://localhost:8000).
+Once running, the frontend is accessible at [http://localhost:3000](http://localhost:3000), and the backend API is accessible at [http://localhost:8000](http://localhost:8000).
 
-## Development Workflow
-
-### Frontend Development
-
-For frontend development with hot reloading, follow these steps:
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-The React application will run locally at [http://localhost:3000](http://localhost:3000) and automatically reload on source code changes.
-
-### Backend Development
-
-The backend is built using FastAPI. For local development with automatic reloading:
-
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
-
-This will run the API locally at [http://localhost:8000](http://localhost:8000).
 
 ## Project Structure
 
@@ -132,6 +107,6 @@ docker compose logs backend
 docker compose logs frontend
 ```
 
-3. Verify port availability (default frontend: `80`, backend: `8000`).
+3. Verify port availability (default frontend: `3000`, backend: `8000`).
 4. Ensure uploaded PDFs are readable and not corrupted.
 
