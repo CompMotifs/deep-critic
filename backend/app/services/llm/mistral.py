@@ -23,7 +23,7 @@ def get_mistral_review(paper_text, prompt):
     messages = [{"role": "user", "content": f"{prompt}\n\nPaper:\n{paper_text}"}]
 
     chat_response = client.chat.complete(
-        model="mistral-small-latest", messages=messages
+        model=os.getenv("MISTRAL_MODEL"), messages=messages
     )
 
     return chat_response.choices[0].message.content.strip()
@@ -43,7 +43,7 @@ def get_updated_mistral_review(paper_text, prompt, review1, review2):
         The raw response from the Mistral API
     """
     messages = [
-        {"role": "system", "content": prompt},
+        {"role": "system", "content": str(prompt)},
         {
             "role": "user",
             "content": f"Review 1:\n{review1}\n\nReview 2:\n{review2}\n\nPaper:\n{paper_text}",
@@ -51,7 +51,7 @@ def get_updated_mistral_review(paper_text, prompt, review1, review2):
     ]
 
     chat_response = client.chat.complete(
-        model="mistral-small-latest", messages=messages
+        model=os.getenv("MISTRAL_MODEL"), messages=messages
     )
 
     return chat_response.choices[0].message.content.strip()
