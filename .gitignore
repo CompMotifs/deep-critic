@@ -26,6 +26,7 @@ docker-compose.override.yml
 Thumbs.db
 .vscode/
 .idea/
+tmp_storage/
 
 # Misc
 .env
