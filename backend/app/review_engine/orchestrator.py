@@ -108,8 +108,6 @@ class ReviewEngine:
             try:
                 aggregated_data = aggregate_feedback(parsed_reviews)
                 consensus_review = convert_to_openreview(aggregated_data)
-                # print("aggregated_data", aggregated_data)
-                # print("consensus_review", consensus_review)
             except Exception as e:
                 consensus_review = {"error": f"Failed to generate consensus: {str(e)}"}
 
@@ -241,7 +239,6 @@ class ReviewEngine:
             Raw response from the LLM service
         """
         try:
-            print("update_review_prompt", self.update_review_prompt)
             if service_name == "openai":
                 return get_updated_openai_review(
                     paper_text, self.update_review_prompt, review1, review2
@@ -353,5 +350,4 @@ class ReviewEngine:
             return formatted
 
         except Exception as e:
-            print(f"Error formatting review: {e}")
             return None
