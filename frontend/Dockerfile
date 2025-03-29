@@ -1,18 +1,15 @@
-FROM node:20-slim
+FROM node:16-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
+COPY package*.json ./
+RUN npm install
 
-# Install dependencies 
-RUN npm ci
+# Do NOT call create-react-app here; use your own existing source files directly
+COPY ./src ./src
+COPY ./public ./public
 
-# Copy application code
-COPY . .
+RUN npm run build
 
-# Expose the application port
-EXPOSE 5000
-
-# Default command - will be overridden by docker-compose
-CMD ["npm", "run", "dev"]
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
