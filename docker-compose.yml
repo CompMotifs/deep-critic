@@ -1,35 +1,21 @@
+# Simple Docker Compose for DeepCritic
 services:
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
     ports:
-      - "8000:8000"
-    volumes:
-      - ./backend:/app
-      - ./tmp_storage:/app/tmp_storage
-    env_file:
-      - .env
+      - "8000:5000"
     environment:
-      - DEBUG=true
-      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
-    networks:
-      - deep_critic_network
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-dummy-key-for-development}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-dummy-key-for-development}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-dummy-key-for-development}
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
     ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "8080:80"
     depends_on:
       - backend
-    networks:
-      - deep_critic_network
-
-networks:
-  deep_critic_network:
-    name: deep_critic_network
+    restart: unless-stopped

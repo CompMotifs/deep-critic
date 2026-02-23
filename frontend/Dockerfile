@@ -1,15 +1,18 @@
-FROM node:16-alpine AS build
+FROM node:20-slim as build
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy all source code first
+COPY . .
+
+# Use npm install instead of npm ci, which is more lenient with package.json format
 RUN npm install
 
-# Do NOT call create-react-app here; use your own existing source files directly
-COPY ./src ./src
-COPY ./public ./public
-
+# Build the app
 RUN npm run build
 
+# Use nginx to serve the app
 FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
